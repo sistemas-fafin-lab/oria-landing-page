@@ -1,0 +1,78 @@
+/* ─────────────────────────────────────────────────────────────
+   ORIA — Base element styles + a few brand utility classes.
+   Applies brand typography defaults; safe to load standalone in
+   any specimen card or UI kit.
+   ───────────────────────────────────────────────────────────── */
+
+.oria, body.oria, .oria-root {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  letter-spacing: var(--tracking-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings — Schibsted/Satoshi, wide tracking */
+.oria-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  font-weight: var(--weight-bold);
+}
+/* Large editorial headline variant — tighter, not uppercased */
+.oria-headline {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+}
+
+/* Eyebrow / kicker label */
+.oria-eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+}
+
+/* Selection + scrollbar in brand colors */
+::selection { background-color: var(--oria-primary); color: var(--oria-light-base); }
+
+/* ── Glassmorphism surface ─────────────────────────────────── */
+.oria-glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-bento-lg);
+}
+
+/* ── Bento card ────────────────────────────────────────────── */
+.oria-bento {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-bento-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+/* Longitudinal sage hairline — the brand's connective line motif */
+.oria-line {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--oria-sage) 30%, var(--oria-sage) 70%, transparent);
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .oria-rise { animation: oria-rise var(--dur-slow) var(--ease-out) both; }
+  @keyframes oria-rise {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}

@@ -1,0 +1,43 @@
+/* ─────────────────────────────────────────────────────────────
+   ORIA — Typography tokens
+   Display: Schibsted Grotesk (Satoshi substitute) — UPPERCASE,
+            wide tracking (0.16em), set heavy.
+   Body:    Hanken Grotesk (Montaser substitute) — sentence case,
+            light tracking (0.02em), 1.5 line-height.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Families */
+  --font-display: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    ui-monospace, "SFMono-Regular", "Menlo", monospace;
+
+  /* Brandbook signature tracking + leading */
+  --tracking-display: 0.16em;   /* Satoshi display — wide */
+  --tracking-tight:   -0.01em;  /* large display headlines */
+  --tracking-body:    0.02em;   /* Montaser body — gentle */
+  --tracking-eyebrow: 0.22em;   /* uppercase eyebrows / labels */
+  --leading-display:  1.4;
+  --leading-body:     1.5;
+  --leading-tight:    1.05;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold:600;
+  --weight-bold:    700;
+  --weight-black:   900;
+
+  /* Type scale — fluid, 1.25 major-third-ish, tuned for premium hero */
+  --text-2xs: 0.6875rem;  /* 11px — micro labels */
+  --text-xs:  0.75rem;    /* 12px */
+  --text-sm:  0.875rem;   /* 14px */
+  --text-base:1rem;       /* 16px */
+  --text-md:  1.125rem;   /* 18px — lead paragraph */
+  --text-lg:  1.375rem;   /* 22px */
+  --text-xl:  1.75rem;    /* 28px */
+  --text-2xl: 2.25rem;    /* 36px */
+  --text-3xl: 3rem;       /* 48px */
+  --text-4xl: clamp(2.75rem, 5vw, 4.5rem);  /* hero */
+  --text-5xl: clamp(3.5rem, 7vw, 6rem);     /* mega hero */
+}

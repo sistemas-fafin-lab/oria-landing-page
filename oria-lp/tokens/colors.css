@@ -1,0 +1,102 @@
+/* ─────────────────────────────────────────────────────────────
+   ORIA — Color tokens
+   Palette from the official Identidade Visual da Oria
+   (tailwind.config.ts → theme.colors.oria). Dark-mode-first brand.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Brand palette (raw) ───────────────────────────────────── */
+  --oria-dark-base:     #111715;   /* near-black green — primary dark bg */
+  --oria-dark-surface:  #0b2e24;   /* deep forest — dark cards / surfaces */
+  --oria-primary:       #1d4d3b;   /* deep green — CTAs, the brand mark */
+  --oria-sage:          #6a8a7a;   /* sage green — graphic lines, accents */
+  --oria-muted:         #788171;   /* grey-green — secondary text, borders */
+  --oria-light-accent:  #b8b5af;   /* warm grey — hairlines, faint shapes */
+  --oria-light-surface: #e7e2d8;   /* sand — light cards / highlight areas */
+  --oria-light-base:    #f4f2ee;   /* off-white — primary light bg */
+
+  /* Extended brand tints (derived, for charts / states) */
+  --oria-primary-deep:  #0a3026;   /* gradient floor for primary */
+  --oria-primary-700:   #143a30;   /* hero headline ink */
+  --oria-mint:          #dce7dd;   /* pale mint — badges, pills */
+  --oria-mint-surface:  #eef2ea;   /* mint wash — section backgrounds */
+
+  /* ── Functional / semantic (LIGHT is the default scope below) ── */
+  --bg-base:        var(--oria-light-base);
+  --bg-surface:     var(--oria-light-surface);
+  --bg-elevated:    #ffffff;
+  --bg-inverse:     var(--oria-dark-base);
+
+  --text-primary:   var(--oria-dark-base);
+  --text-secondary: color-mix(in oklab, var(--oria-dark-base) 72%, transparent);
+  --text-muted:     var(--oria-muted);
+  --text-on-dark:   var(--oria-light-base);
+  --text-on-primary:var(--oria-light-base);
+
+  --accent:         var(--oria-primary);
+  --accent-hover:   var(--oria-primary-deep);
+  --accent-soft:    var(--oria-mint);
+
+  --border-subtle:  color-mix(in oklab, var(--oria-dark-base) 10%, transparent);
+  --border-default: color-mix(in oklab, var(--oria-sage) 28%, transparent);
+  --border-strong:  color-mix(in oklab, var(--oria-primary) 24%, transparent);
+
+  /* Glass / overlay tints */
+  --glass-bg:       rgba(244, 242, 238, 0.60);
+  --glass-border:   rgba(184, 181, 175, 0.30);
+  --overlay:        rgba(244, 242, 238, 0.80);
+
+  /* Semantic status (kept in-family, low-saturation) */
+  --ok:      #1d4d3b;
+  --ok-soft: #dcefe3;
+
+  /* ── Section-to-film glow ─────────────────────────────────── */
+  --shadow-section-bottom: 0 24px 64px -8px rgba(0,0,0,0.55);
+  --shadow-section-top:    0 -24px 64px -8px rgba(0,0,0,0.55);
+
+  /* ── LivingLines theme-aware colors (Hero tone) ───────────── */
+  --living-lines-base:      #5a7a6a;
+  --living-lines-glow:      #2a6a51;
+  --badge-hero-text:        var(--oria-primary);
+  --warn:    #9a7b2e;
+  --warn-soft:#f3ecd6;
+  --alert:   #9a3b2e;
+  --alert-soft:#f3dcd6;
+}
+
+/* ── Dark scope ────────────────────────────────────────────────
+   Apply [data-theme="dark"] or .dark on a container / <html>.
+   This is the brand's default presentation context.            */
+.dark,
+[data-theme="dark"] {
+  --bg-base:        var(--oria-dark-base);
+  --bg-surface:     var(--oria-dark-surface);
+  --bg-elevated:    #14201b;
+  --bg-inverse:     var(--oria-light-base);
+
+  --text-primary:   var(--oria-light-base);
+  --text-secondary: color-mix(in oklab, var(--oria-light-base) 78%, transparent);
+  --text-muted:     color-mix(in oklab, var(--oria-light-base) 65%, transparent);
+  --text-on-dark:   var(--oria-light-base);
+
+  --accent:         var(--oria-sage);
+  --accent-hover:   #7d9d8d;
+  --accent-soft:    rgba(106, 138, 122, 0.20);
+
+  --border-subtle:  color-mix(in oklab, var(--oria-light-base) 10%, transparent);
+  --border-default: color-mix(in oklab, var(--oria-sage) 24%, transparent);
+  --border-strong:  color-mix(in oklab, var(--oria-sage) 40%, transparent);
+
+  --glass-bg:       rgba(11, 46, 36, 0.50);
+  --glass-border:   rgba(106, 138, 122, 0.20);
+  --overlay:        rgba(17, 23, 21, 0.80);
+
+  --ok-soft: rgba(106,138,122,0.18);
+
+  --shadow-section-bottom: 0 24px 64px -8px rgba(159,230,189,0.22);
+  --shadow-section-top:    0 -24px 64px -8px rgba(159,230,189,0.22);
+
+  --living-lines-base:      #6a8a7a;
+  --living-lines-glow:      #9fe6bd;
+  --badge-hero-text:        #bfe0cb;
+}

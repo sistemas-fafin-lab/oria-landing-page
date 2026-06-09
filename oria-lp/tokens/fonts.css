@@ -1,0 +1,13 @@
+/* ─────────────────────────────────────────────────────────────
+   ORIA — Fonts
+   Brandbook calls for Satoshi (display) + Montaser (body).
+   Both are proprietary / not redistributable here, so this file
+   loads the closest open substitutes from Google Fonts and aliases
+   them to the brand font tokens. SUBSTITUTION — swap the @font-face
+   sources for the real Satoshi-Variable.woff2 / Montaser-*.woff2
+   when the licensed files are available.
+     · Display  Satoshi   → Schibsted Grotesk   (geometric grotesque)
+     · Body     Montaser  → Hanken Grotesk      (humanist grotesque)
+   ───────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap");
