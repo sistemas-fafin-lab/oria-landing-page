@@ -6,11 +6,10 @@ import {
   Reveal,
   useReducedMotion,
   useCountUp,
-  useTrack,
-  useMouseParallax,
   LivingLines,
 } from "./motion";
-import { WhatsAppModal } from "./chat";
+import { UserMenu } from "./user-menu";
+import { HeroPhoneScene } from "./phone-chat";
 import { Film } from "./film/film";
 
 const WA = "Enviar exame pelo WhatsApp";
@@ -28,10 +27,14 @@ export function Nav({
   onSend,
   theme,
   toggleTheme,
+  onLoginClick,
+  onSignupClick,
 }: {
   onSend: () => void;
   theme: string;
   toggleTheme: () => void;
+  onLoginClick: () => void;
+  onSignupClick: () => void;
 }) {
   const [active, setActive] = React.useState<string | null>(null);
   const links = [
@@ -79,118 +82,131 @@ export function Nav({
           pointerEvents: "auto",
           display: "flex",
           alignItems: "center",
-          gap: 22,
-          width: "auto",
-          maxWidth: "calc(100vw - 32px)",
-          padding: "10px 12px 10px 22px",
-          borderRadius: "var(--radius-pill)",
-          background: "var(--glass-bg)",
-          WebkitBackdropFilter: "blur(var(--blur-glass))",
-          backdropFilter: "blur(var(--blur-glass))",
-          border: "1px solid var(--glass-border)",
-          boxShadow: "var(--shadow-glass)",
+          gap: 10,
         }}
       >
-        <a
-          href="#top"
-          style={{
-            textDecoration: "none",
-            display: "inline-flex",
-          }}
-        >
-          <Logo
-            tone={theme === "dark" ? "light" : "primary"}
-            size={24}
-          />
-        </a>
-        <nav
-          style={{ display: "flex", gap: 4 }}
-          className="oria-nav-links"
-        >
-          {links.map((l) => {
-            const isActive = active === l.id;
-            return (
-              <a
-                key={l.href}
-                href={l.href}
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: isActive
-                    ? "var(--text-primary)"
-                    : "var(--text-secondary)",
-                  textDecoration: "none",
-                  letterSpacing: "0.01em",
-                  whiteSpace: "nowrap",
-                  padding: "6px 15px",
-                  borderRadius: 999,
-                  background: isActive
-                    ? "var(--accent-soft)"
-                    : "transparent",
-                  transition:
-                    "background 0.28s var(--ease-apple), color 0.28s var(--ease-apple)",
-                }}
-                onMouseOver={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color =
-                      "var(--text-primary)";
-                    e.currentTarget.style.background =
-                      "rgba(106,138,122,0.10)";
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color =
-                      "var(--text-secondary)";
-                    e.currentTarget.style.background =
-                      "transparent";
-                  }
-                }}
-              >
-                {l.label}
-              </a>
-            );
-          })}
-        </nav>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 22,
+            width: "auto",
+            maxWidth: "calc(100vw - 32px)",
+            padding: "10px 12px 10px 22px",
+            borderRadius: "var(--radius-pill)",
+            background: "var(--glass-bg)",
+            WebkitBackdropFilter: "blur(var(--blur-glass))",
+            backdropFilter: "blur(var(--blur-glass))",
+            border: "1px solid var(--glass-border)",
+            boxShadow: "var(--shadow-glass)",
           }}
         >
-          <button
-            onClick={toggleTheme}
-            aria-label="Alternar tema"
+          <a
+            href="#top"
             style={{
-              background: "transparent",
-              border: "1px solid var(--border-default)",
-              color: "var(--text-secondary)",
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              cursor: "pointer",
+              textDecoration: "none",
               display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
             }}
           >
-            <Icon
-              name={theme === "dark" ? "sun" : "moon"}
-              size={16}
-              color="currentColor"
+            <Logo
+              tone={theme === "dark" ? "light" : "primary"}
+              size={24}
             />
-          </button>
-          <Button variant="primary" size="sm" onClick={onSend}>
-            Enviar exame
-            <Icon
-              name="arrow-up-right"
-              size={16}
-              color="#f4f2ee"
-            />
-          </Button>
+          </a>
+          <nav
+            style={{ display: "flex", gap: 4 }}
+            className="oria-nav-links"
+          >
+            {links.map((l) => {
+              const isActive = active === l.id;
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: isActive
+                      ? "var(--text-primary)"
+                      : "var(--text-secondary)",
+                    textDecoration: "none",
+                    letterSpacing: "0.01em",
+                    whiteSpace: "nowrap",
+                    padding: "6px 15px",
+                    borderRadius: 999,
+                    background: isActive
+                      ? "var(--accent-soft)"
+                      : "transparent",
+                    transition:
+                      "background 0.28s var(--ease-apple), color 0.28s var(--ease-apple)",
+                  }}
+                  onMouseOver={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color =
+                        "var(--text-primary)";
+                      e.currentTarget.style.background =
+                        "rgba(106,138,122,0.10)";
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color =
+                        "var(--text-secondary)";
+                      e.currentTarget.style.background =
+                        "transparent";
+                    }
+                  }}
+                >
+                  {l.label}
+                </a>
+              );
+            })}
+          </nav>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <button
+              onClick={toggleTheme}
+              aria-label="Alternar tema"
+              style={{
+                background: "transparent",
+                border: "1px solid var(--border-default)",
+                color: "var(--text-secondary)",
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Icon
+                name={theme === "dark" ? "sun" : "moon"}
+                size={16}
+                color="currentColor"
+              />
+            </button>
+            <Button variant="primary" size="sm" onClick={onSend}>
+              Enviar exame
+              <Icon
+                name="arrow-up-right"
+                size={16}
+                color="#f4f2ee"
+              />
+            </Button>
+          </div>
         </div>
+        <UserMenu
+          theme={theme as "dark" | "light"}
+          onLoginClick={onLoginClick}
+          onSignupClick={onSignupClick}
+        />
       </div>
     </header>
   );
@@ -211,8 +227,11 @@ function Glow({
       className={className}
       style={{
         position: "absolute",
-        borderRadius: "50%",
-        background: `radial-gradient(circle, ${color}, transparent 70%)`,
+        borderTopLeftRadius: "50%",
+        borderTopRightRadius: "50%",
+        borderBottomRightRadius: "50%",
+        borderBottomLeftRadius: "50%",
+        backgroundImage: `radial-gradient(circle, ${color}, transparent 70%)`,
         pointerEvents: "none",
         willChange: "transform",
         ...style,
@@ -285,11 +304,9 @@ function SectionHead({
 /* ── Hero ──────────────────────────────────────────────────────────────── */
 export function Hero({ onSend }: { onSend: () => void }) {
   const reduced = useReducedMotion();
-  const [parallaxRef, mo] = useMouseParallax(0.1);
 
   return (
     <section
-      ref={parallaxRef as React.RefObject<HTMLDivElement>}
       id="top"
       style={{
         position: "relative",
@@ -300,52 +317,32 @@ export function Hero({ onSend }: { onSend: () => void }) {
         boxShadow: "var(--shadow-section-bottom)",
       }}
     >
-      <div
+      <Glow
+        className="oria-breathe"
         style={{
+          top: -160,
+          right: -80,
+          width: 520,
+          height: 520,
+          opacity: 0.7,
           position: "absolute",
-          inset: 0,
           pointerEvents: "none",
-          transform: reduced
-            ? "none"
-            : `translate(${mo.x * 80}px, ${mo.y * 80}px)`,
-          transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)",
         }}
-      >
-        <Glow
-          className="oria-breathe"
-          style={{
-            top: -160,
-            right: -80,
-            width: 520,
-            height: 520,
-            opacity: 0.7,
-          }}
-        />
-      </div>
-      <div
+      />
+      <Glow
+        className="oria-breathe"
         style={{
+          bottom: -200,
+          left: -120,
+          width: 440,
+          height: 440,
+          opacity: 0.5,
+          animationDelay: "-8s",
           position: "absolute",
-          inset: 0,
           pointerEvents: "none",
-          transform: reduced
-            ? "none"
-            : `translate(${mo.x * -60}px, ${mo.y * -60}px)`,
-          transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)",
         }}
-      >
-        <Glow
-          className="oria-breathe"
-          style={{
-            bottom: -200,
-            left: -120,
-            width: 440,
-            height: 440,
-            opacity: 0.5,
-            animationDelay: "-8s",
-          }}
-          color="rgba(29,77,59,0.45)"
-        />
-      </div>
+        color="rgba(29,77,59,0.45)"
+      />
       <LivingLines />
       <div
         style={{
@@ -357,10 +354,6 @@ export function Hero({ onSend }: { onSend: () => void }) {
           gap: 56,
           padding: "124px 32px 96px",
           alignItems: "center",
-          transform: reduced
-            ? "none"
-            : `translate(${mo.x * -35}px, ${mo.y * -24}px)`,
-          transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)",
         }}
         className="oria-hero-grid"
       >
@@ -472,7 +465,7 @@ export function Hero({ onSend }: { onSend: () => void }) {
           </Reveal>
         </div>
         <Reveal appear delay={380} y={36}>
-          <HeroPanel />
+          <HeroPhoneScene />
         </Reveal>
       </div>
     </section>
@@ -1102,41 +1095,54 @@ export function Solution() {
 /* ── HowItWorks ────────────────────────────────────────────────────────── */
 export function HowItWorks() {
   const reduced = useReducedMotion();
-  const [railRef, p] = useTrack();
-  const [active, setActive] = React.useState(false);
+  const rootRef = React.useRef<HTMLElement>(null);
+  const [step, setStep] = React.useState(-1);
+
   React.useEffect(() => {
-    const t = setTimeout(() => setActive(true), 120);
-    return () => clearTimeout(t);
-  }, []);
+    if (reduced) { setStep(2); return; }
+    const timeline = [
+      { s: -1, d: 560 },
+      { s: 0,  d: 1700 },
+      { s: 1,  d: 2200 },
+      { s: 2,  d: 4000 },
+    ];
+    let started = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const start = () => {
+      if (started) return; started = true;
+      let i = 0;
+      const run = () => {
+        setStep(timeline[i].s);
+        timer = setTimeout(() => { i = (i + 1) % timeline.length; run(); }, timeline[i].d);
+      };
+      run();
+    };
+
+    let io: IntersectionObserver | undefined;
+    const el = rootRef.current;
+    if (el && typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        (es) => { if (es.some((e) => e.isIntersecting)) start(); },
+        { threshold: 0.2 }
+      );
+      io.observe(el);
+    }
+    const fb = setTimeout(start, 1200);
+    return () => { clearTimeout(timer!); clearTimeout(fb); if (io) io.disconnect(); };
+  }, [reduced]);
 
   const steps = [
-    {
-      n: "01",
-      ic: "message-circle",
-      t: "Você envia",
-      d: "Mande o PDF ou a foto do exame no WhatsApp — sem app, sem cadastro.",
-    },
-    {
-      n: "02",
-      ic: "sparkles",
-      t: "A ORIA processa",
-      d: "Organiza, extrai e interpreta cada marcador, com contexto.",
-    },
-    {
-      n: "03",
-      ic: "file-check",
-      t: "Você recebe",
-      d: "Resumo claro, relatório visual e histórico — em segundos.",
-    },
+    { n: "01", ic: "message-circle", t: "Você envia",      d: "Mande o PDF ou a foto do exame no WhatsApp — sem app, sem cadastro." },
+    { n: "02", ic: "sparkles",       t: "A ORIA processa", d: "Organiza, extrai e interpreta cada marcador, com contexto." },
+    { n: "03", ic: "file-check",     t: "Você recebe",     d: "Resumo claro, relatório visual e histórico — em segundos." },
   ];
 
   return (
     <section
       id="como"
-      style={{
-        position: "relative",
-        overflow: "hidden",
-      }}
+      ref={rootRef}
+      style={{ position: "relative", overflow: "hidden" }}
     >
       <div
         style={{
@@ -1146,24 +1152,13 @@ export function HowItWorks() {
         }}
       >
         <Reveal appear>
-          <div
-            style={{
-              maxWidth: 680,
-              margin: "0 auto",
-              textAlign: "center",
-            }}
-          >
+          <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
             <Eyebrow>Como funciona</Eyebrow>
             <h2
               className="oria-headline"
-              style={{
-                fontSize: "var(--text-3xl)",
-                margin: "14px 0 0",
-                color: "var(--text-primary)",
-              }}
+              style={{ fontSize: "var(--text-3xl)", margin: "14px 0 0", color: "var(--text-primary)" }}
             >
-              Do WhatsApp ao relatório, em uma linha
-              só.
+              Do WhatsApp ao relatório, em uma linha só.
             </h2>
             <p
               style={{
@@ -1173,98 +1168,62 @@ export function HowItWorks() {
                 margin: "16px 0 0",
               }}
             >
-              Três passos numa mesma trajetória — você
-              acompanha a sua saúde se tornar clara.
+              Três passos numa mesma trajetória — você acompanha a sua saúde se tornar clara.
             </p>
           </div>
         </Reveal>
 
-        <div
-          className="oria-flow"
-          style={{ marginTop: 64 }}
-        >
+        <div className="oria-flow" style={{ marginTop: 64 }}>
           <div className="oria-flow-art">
-            <Reveal appear delay={60} y={30}>
-              <ArtSend active={active} />
-            </Reveal>
-            <Reveal appear delay={220} y={30}>
-              <ArtProcess
-                active={active}
-                reduced={reduced}
-              />
-            </Reveal>
-            <Reveal appear delay={380} y={30}>
-              <ArtReport active={active} />
-            </Reveal>
+            <Reveal appear delay={60}  y={30}><ArtSend    active={step >= 0} current={step === 0} /></Reveal>
+            <Reveal appear delay={220} y={30}><ArtProcess active={step >= 1} current={step === 1} reduced={reduced} /></Reveal>
+            <Reveal appear delay={380} y={30}><ArtReport  active={step >= 2} current={step === 2} /></Reveal>
           </div>
 
-          <div
-            ref={
-              railRef as React.RefObject<HTMLDivElement>
-            }
-            className="oria-flow-rail"
-          >
-            <Rail p={p} reduced={reduced} />
+          <div className="oria-flow-rail">
+            <Rail step={step} reduced={reduced} />
             <div className="oria-flow-nodes">
-              {steps.map((s, i) => (
-                <Reveal
-                  key={s.n}
-                  appear
-                  delay={120 + i * 150}
-                  y={18}
-                >
-                  <div className="oria-node-col">
-                    <span className="oria-node-stem" />
-                    <span className="oria-node">
-                      {s.n}
-                    </span>
-                    <div className="oria-node-label">
-                      <span
-                        style={{
-                          display:
-                            "inline-flex",
-                          alignItems:
-                            "center",
-                          gap: 9,
-                          justifyContent:
-                            "center",
-                        }}
-                      >
-                        <Icon
-                          name={s.ic}
-                          size={18}
-                          color="var(--accent)"
-                        />
-                        <strong
+              {steps.map((s, i) => {
+                const future = step >= 0 && step < i;
+                const current = step === i;
+                return (
+                  <Reveal key={s.n} appear delay={120 + i * 150} y={18}>
+                    <div className={"oria-node-col" + (future ? " is-future" : "")}>
+                      <span className="oria-node-stem" />
+                      <span className={"oria-node" + (current ? " is-current" : "") + (future ? " is-future" : "")}>
+                        {s.n}
+                      </span>
+                      <div className="oria-node-label">
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 9, justifyContent: "center" }}>
+                          <Icon name={s.ic} size={18} color="var(--accent)" />
+                          <strong
+                            style={{
+                              fontFamily: "var(--font-display)",
+                              fontWeight: 700,
+                              letterSpacing: "-0.01em",
+                              fontSize: 20,
+                              color: "var(--text-primary)",
+                            }}
+                          >
+                            {s.t}
+                          </strong>
+                        </span>
+                        <p
                           style={{
-                            fontFamily:
-                              "var(--font-display)",
-                            fontWeight: 700,
-                            letterSpacing:
-                              "-0.01em",
-                            fontSize: 20,
-                            color: "var(--text-primary)",
+                            fontSize: 14,
+                            lineHeight: 1.55,
+                            color: "var(--text-secondary)",
+                            margin: "9px auto 0",
+                            maxWidth: 280,
                           }}
                         >
-                          {s.t}
-                        </strong>
-                      </span>
-                      <p
-                        style={{
-                          fontSize: 14,
-                          lineHeight: 1.55,
-                          color: "var(--text-secondary)",
-                          margin:
-                            "9px auto 0",
-                          maxWidth: 280,
-                        }}
-                      >
-                        {s.d}
-                      </p>
+                          {s.d}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Reveal>
-              ))}
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1274,49 +1233,32 @@ export function HowItWorks() {
 }
 
 /* ── Rail ──────────────────────────────────────────────────────────────── */
-function Rail({
-  p,
-  reduced,
-}: {
-  p: number;
-  reduced: boolean;
-}) {
-  const START = 16.667,
-    SPAN = 66.666;
-  const prog = reduced ? 1 : p;
-  const pos = START + prog * SPAN;
+function Rail({ step, reduced }: { step: number; reduced: boolean }) {
+  const centers = [16.667, 50, 83.333];
+  const START = 16.667;
+  const on = reduced ? true : step >= 0;
+  const idx = reduced ? 2 : Math.max(0, step);
+  const pos = on ? centers[idx] : START;
   return (
     <div className="oria-rail" aria-hidden="true">
       <span className="oria-rail-base" />
       <span
         className="oria-rail-fill"
-        style={{
-          left: START + "%",
-          width: pos - START + "%",
-        }}
+        style={{ left: START + "%", width: (pos - START) + "%", opacity: on ? 1 : 0 }}
       />
-      <span
-        className="oria-rail-arrow"
-        style={{ left: "41.5%" }}
-      />
-      <span
-        className="oria-rail-arrow"
-        style={{ left: "58.5%" }}
-      />
+      <span className="oria-rail-arrow" style={{ left: "41.5%" }} />
+      <span className="oria-rail-arrow" style={{ left: "58.5%" }} />
       {!reduced && (
-        <span
-          className="oria-rail-pulse"
-          style={{ left: pos + "%" }}
-        />
+        <span className="oria-rail-pulse" style={{ left: pos + "%", opacity: on ? 1 : 0 }} />
       )}
     </div>
   );
 }
 
 /* ── ArtSend ───────────────────────────────────────────────────────────── */
-function ArtSend({ active }: { active: boolean }) {
+function ArtSend({ active, current }: { active: boolean; current: boolean }) {
   return (
-    <div className="oria-art oria-art-chat">
+    <div className={"oria-art oria-art-chat" + (current ? " is-current" : active ? "" : " is-idle")}>
       <div className="oria-chat-head">
         <span
           style={{
@@ -1406,9 +1348,11 @@ function ArtSend({ active }: { active: boolean }) {
 /* ── ArtProcess ────────────────────────────────────────────────────────── */
 function ArtProcess({
   active,
+  current,
   reduced,
 }: {
   active: boolean;
+  current: boolean;
   reduced: boolean;
 }) {
   const markers = [
@@ -1417,7 +1361,7 @@ function ArtProcess({
     { l: "Glicose", s: "ok", w: 64 },
   ];
   return (
-    <div className="oria-art oria-art-scan">
+    <div className={"oria-art oria-art-scan" + (current ? " is-current" : active ? "" : " is-idle")}>
       <span
         className="oria-scan-glow"
         aria-hidden="true"
@@ -1523,10 +1467,10 @@ function ArtProcess({
 }
 
 /* ── ArtReport ─────────────────────────────────────────────────────────── */
-function ArtReport({ active }: { active: boolean }) {
+function ArtReport({ active, current }: { active: boolean; current: boolean }) {
   const score = useCountUp(86, active, 1200);
   return (
-    <div className="oria-art oria-art-report">
+    <div className={"oria-art oria-art-report" + (current ? " is-current" : active ? "" : " is-idle")}>
       <div
         style={{
           display: "flex",
@@ -2128,7 +2072,10 @@ function HoverGlow({
       <div
         style={{
           position: "absolute",
-          inset: -1,
+          top: -1,
+          right: -1,
+          bottom: -1,
+          left: -1,
           borderRadius: "var(--radius-bento-sm)",
           opacity: hov ? 1 : 0,
           boxShadow: hov

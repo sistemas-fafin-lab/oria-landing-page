@@ -18,6 +18,85 @@ body {
   font-family: var(--font-body);
 }
 
+/* ── Cadastro/Login layout styles ───────────────────────────── */
+.oria-cad-shell {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.oria-cad-brand {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.oria-cad-form-wrap {
+  display: flex;
+  flex-direction: column;
+  padding: 56px 64px;
+  position: relative;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.oria-cad-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.oria-cad-floats {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 44px;
+  padding-top: 0;
+}
+
+.oria-step-enter {
+  animation: oria-step-in 0.5s var(--ease-spring) both;
+}
+
+@keyframes oria-step-in {
+  from { transform: translateX(20px); }
+  to { transform: none; }
+}
+
+@media (max-width: 920px) {
+  .oria-cad-shell {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .oria-cad-brand {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 48px 32px 56px !important;
+  }
+  .oria-cad-floats {
+    display: none !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .oria-cad-2col {
+    grid-template-columns: 1fr !important;
+  }
+  .oria-cad-form-wrap {
+    padding: 40px 24px 56px !important;
+  }
+  .oria-cad-brand {
+    padding: 40px 26px 48px !important;
+  }
+}
+
 /* ── Nav ──────────────────────────────────────────────────── */
 .oria-nav-links {
   display: flex;
@@ -36,6 +115,15 @@ body {
   border-radius: var(--radius-bento-sm);
   overflow: hidden;
   box-shadow: var(--shadow-premium);
+  transition: box-shadow 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
+}
+
+.oria-art.is-current {
+  box-shadow: var(--shadow-premium), 0 0 0 2px var(--accent), 0 0 28px rgba(159, 230, 189, 0.22);
+}
+
+.oria-art.is-idle {
+  opacity: 0.5;
 }
 
 .oria-art-chat {
@@ -285,7 +373,7 @@ body {
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(90deg, transparent, var(--accent));
-  transition: width .2s linear;
+  transition: width 0.7s var(--ease-out), opacity 0.4s var(--ease-out);
 }
 
 .oria-rail-arrow {
@@ -308,7 +396,7 @@ body {
   border-radius: 999px;
   background: #9fe6bd;
   box-shadow: 0 0 14px 4px rgba(159, 230, 189, 0.65);
-  transition: left .2s linear;
+  transition: left 0.7s var(--ease-out), opacity 0.4s var(--ease-out);
 }
 
 .oria-flow-nodes {
@@ -354,6 +442,16 @@ body {
 
 .oria-node-label {
   margin-top: 16px;
+}
+
+.oria-node.is-current {
+  box-shadow: var(--shadow-cta), 0 0 0 3px rgba(159, 230, 189, 0.4);
+}
+
+.oria-node.is-future,
+.oria-node-col.is-future {
+  opacity: 0.38;
+  transition: opacity 0.5s var(--ease-out);
 }
 
 /* ── Media queries ───────────────────────────────────────────── */
@@ -428,6 +526,25 @@ body {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
   }
+  /* floating card gentle bob */
+  .oria-float-card {
+    animation: oria-floatcard 6s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes oria-floatcard {
+    0%, 100% { transform: translateY(0) translateZ(0); }
+    50%      { transform: translateY(-7px) translateZ(0); }
+  }
+
+  /* SVG line travel pulse */
+  .oria-line-travel {
+    animation: oria-line-travel 7s linear infinite;
+  }
+  @keyframes oria-line-travel {
+    from { stroke-dashoffset: 1140; }
+    to   { stroke-dashoffset: 0; }
+  }
+
   /* one-time pop-in for the floating CTA */
   .oria-cta-in {
     animation: oria-cta-in 0.6s var(--ease-spring) 0.9s both;

@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-
-let __llSeq = 0;
+import { useState, useEffect, useRef, useCallback, useId } from "react";
 
 /* Scroll progress CSS var publisher */
 function useScrollProgressVar() {
@@ -248,7 +246,8 @@ export function LivingLines({
   const effectiveP =
     range > 0.001 ? Math.max(0, Math.min(1, (p - p0) / range)) : 0;
   const idRef = useRef<string | null>(null);
-  if (idRef.current === null) idRef.current = "ll" + ++__llSeq;
+  const reactId = useId();
+  if (idRef.current === null) idRef.current = reactId.replace(/:/g, "");
   const id = idRef.current!;
 
   const paths = [
@@ -271,7 +270,10 @@ export function LivingLines({
       ref={ref as React.RefObject<HTMLDivElement>}
       style={{
         position: "absolute",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         pointerEvents: "none",
       }}
     >
@@ -280,7 +282,10 @@ export function LivingLines({
         preserveAspectRatio="none"
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
           width: "100%",
           height: "100%",
         }}

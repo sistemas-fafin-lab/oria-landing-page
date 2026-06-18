@@ -449,16 +449,7 @@ export function Stage({
   hideBar?: boolean;
   children: React.ReactNode;
 }) {
-  const [time, setTime] = React.useState(() => {
-    try {
-      const v = parseFloat(
-        localStorage.getItem(persistKey + ":t") || "0"
-      );
-      return isFinite(v) ? clamp(v, 0, duration) : 0;
-    } catch {
-      return 0;
-    }
-  });
+  const [time, setTime] = React.useState(0);
   const [playing, setPlaying] = React.useState(autoplay);
   const [hoverTime, setHoverTime] = React.useState<number | null>(null);
   const [scale, setScale] = React.useState(1);
@@ -467,6 +458,17 @@ export function Stage({
   const canvasRef = React.useRef<HTMLDivElement>(null);
   const rafRef = React.useRef<number>(0);
   const lastTsRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    try {
+      const v = parseFloat(
+        localStorage.getItem(persistKey + ":t") || "0"
+      );
+      if (isFinite(v) && v > 0) {
+        setTime(clamp(v, 0, duration));
+      }
+    } catch {}
+  }, []);
 
   React.useEffect(() => {
     try {
@@ -566,7 +568,10 @@ export function Stage({
       ref={stageRef}
       style={{
         position: "absolute",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

@@ -281,7 +281,10 @@ export function Backdrop({ duration }: { duration: number }) {
     <div
       style={{
         position: "absolute",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         overflow: "hidden",
         pointerEvents: "none",
       }}
@@ -293,8 +296,11 @@ export function Backdrop({ duration }: { duration: number }) {
           right: -160,
           width: 900,
           height: 900,
-          borderRadius: "50%",
-          background:
+          borderTopLeftRadius: "50%",
+          borderTopRightRadius: "50%",
+          borderBottomRightRadius: "50%",
+          borderBottomLeftRadius: "50%",
+          backgroundImage:
             "radial-gradient(circle, rgba(106,138,122,0.30), transparent 68%)",
           transform: `scale(${breathe})`,
         }}
@@ -306,8 +312,11 @@ export function Backdrop({ duration }: { duration: number }) {
           left: -200,
           width: 820,
           height: 820,
-          borderRadius: "50%",
-          background:
+          borderTopLeftRadius: "50%",
+          borderTopRightRadius: "50%",
+          borderBottomRightRadius: "50%",
+          borderBottomLeftRadius: "50%",
+          backgroundImage:
             "radial-gradient(circle, rgba(29,77,59,0.42), transparent 70%)",
           transform: `scale(${breathe2})`,
         }}
@@ -319,7 +328,10 @@ export function Backdrop({ duration }: { duration: number }) {
         fill="none"
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
           transform: `translateY(${drift}px)`,
         }}
       >
@@ -372,8 +384,11 @@ export function Backdrop({ duration }: { duration: number }) {
       <div
         style={{
           position: "absolute",
-          inset: 0,
-          background:
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundImage:
             "radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(8,12,10,0.55) 100%)",
         }}
       />

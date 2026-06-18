@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icon } from "../components/parts";
 import {
   Nav,
@@ -14,15 +15,24 @@ import {
   FinalCTA,
   Footer,
 } from "../components/sections";
-import { WhatsAppModal } from "../components/chat";
+import { OriaAssistant } from "../components/chat";
 
 export default function Home() {
+  const router = useRouter();
   const [theme, setTheme] = useState("dark");
   const [chatOpen, setChatOpen] = useState(false);
 
   const toggleTheme = () =>
     setTheme((t) => (t === "dark" ? "light" : "dark"));
   const openChat = () => setChatOpen(true);
+
+  const handleLoginClick = () => {
+    router.push("/login");
+  };
+
+  const handleSignupClick = () => {
+    router.push("/signup");
+  };
 
   return (
     <div
@@ -39,6 +49,8 @@ export default function Home() {
         onSend={openChat}
         theme={theme}
         toggleTheme={toggleTheme}
+        onLoginClick={handleLoginClick}
+        onSignupClick={handleSignupClick}
       />
       <main>
         <Hero onSend={openChat} />
@@ -52,7 +64,7 @@ export default function Home() {
       </main>
       <Footer />
 
-      {/* Floating WhatsApp button */}
+      {/* Floating ORIA assistant button */}
       <div
         className="oria-cta-in"
         style={{
@@ -64,7 +76,7 @@ export default function Home() {
       >
         <button
           onClick={openChat}
-          aria-label="Abrir WhatsApp"
+          aria-label="Abrir assistente ORIA"
           className="oria-float-cta"
           style={{
             display: "inline-flex",
@@ -88,11 +100,11 @@ export default function Home() {
             size={20}
             color="#f4f2ee"
           />
-          WhatsApp
+          ORIA
         </button>
       </div>
 
-      <WhatsAppModal
+      <OriaAssistant
         open={chatOpen}
         onClose={() => setChatOpen(false)}
       />

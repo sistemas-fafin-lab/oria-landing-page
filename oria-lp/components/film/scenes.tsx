@@ -179,7 +179,7 @@ export function SceneProblem() {
   ];
   const qOp = 0.1 + 0.05 * Math.sin(localTime * 1.4);
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
       <div
         style={{
           position: "absolute",
@@ -198,7 +198,10 @@ export function SceneProblem() {
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
           transform: `scale(${cam})`,
           transformOrigin: "560px 430px",
         }}
@@ -257,7 +260,7 @@ export function SceneSend() {
   const chipIn = Easing.easeOutBack(clamp((localTime - 1.15) / 0.6, 0, 1));
   const sent = clamp((localTime - 1.9) / 0.4, 0, 1);
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
       {minis.map((c) => (
         <ExamCard key={c.label} {...c} localTime={localTime} flyTo={flyTarget} />
       ))}
@@ -488,13 +491,13 @@ export function SceneProcess() {
     { sx: 900, sy: 850, d: 0.42 },
   ];
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
       <svg
         viewBox="0 0 1920 1080"
         width="1920"
         height="1080"
         fill="none"
-        style={{ position: "absolute", inset: 0 }}
+        style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
       >
         <defs>
           <filter
@@ -722,7 +725,7 @@ export function SceneReceive() {
     { m: "Ago", v: 84 },
   ];
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
       <div
         style={{
           position: "absolute",
@@ -953,7 +956,7 @@ export function SceneClose() {
   } as const;
 
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
       <div
         style={{
           position: "absolute",

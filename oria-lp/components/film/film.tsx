@@ -22,7 +22,10 @@ function SceneWelcome() {
     <div
       style={{
         position: "absolute",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -477,7 +480,10 @@ export function FilmOverlay({
       aria-label="Filme da marca ORIA"
       style={{
         position: "fixed",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         zIndex: 200,
         background: "#0a0a0a",
         clipPath: expanded
