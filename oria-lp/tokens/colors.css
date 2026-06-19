@@ -42,8 +42,8 @@
   --border-strong:  color-mix(in oklab, var(--oria-primary) 24%, transparent);
 
   /* Glass / overlay tints */
-  --glass-bg:       rgba(244, 242, 238, 0.60);
-  --glass-border:   rgba(184, 181, 175, 0.30);
+  --glass-bg:       rgba(244, 242, 238, 0.82);
+  --glass-border:   rgba(184, 181, 175, 0.36);
   --overlay:        rgba(244, 242, 238, 0.80);
 
   /* Semantic status (kept in-family, low-saturation) */
@@ -87,8 +87,8 @@
   --border-default: color-mix(in oklab, var(--oria-sage) 24%, transparent);
   --border-strong:  color-mix(in oklab, var(--oria-sage) 40%, transparent);
 
-  --glass-bg:       rgba(11, 46, 36, 0.50);
-  --glass-border:   rgba(106, 138, 122, 0.20);
+  --glass-bg:       rgba(11, 37, 29, 0.78);
+  --glass-border:   rgba(106, 138, 122, 0.26);
   --overlay:        rgba(17, 23, 21, 0.80);
 
   --ok-soft: rgba(106,138,122,0.18);
