@@ -349,7 +349,7 @@ function ChatComposer() {
 export function HeroPhoneScene() {
   const reduced = useReducedMotion();
   return (
-    <div style={{ position: "relative", width: "min(500px, 100%)", margin: "0 auto", minHeight: 720, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div className="oria-hero-phone" style={{ position: "relative", width: "min(500px, 100%)", margin: "0 auto", minHeight: 720, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div aria-hidden="true" className={reduced ? "" : "pc-breathe"} style={{ position: "absolute", width: 440, height: 440, borderRadius: "50%", background: "radial-gradient(circle, rgba(106,138,122,0.24), transparent 66%)", zIndex: 0, willChange: "transform" }} />
 
       <svg aria-hidden="true" viewBox="0 0 500 720" preserveAspectRatio="xMidYMid meet" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, overflow: "visible" }} fill="none">

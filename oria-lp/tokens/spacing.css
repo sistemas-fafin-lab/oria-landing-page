@@ -53,4 +53,8 @@
   /* ── Layout ───────────────────────────────────────────────── */
   --container-max: 1200px;
   --container-wide: 1320px;
+
+  /* Horizontal page gutter — overridden smaller on mobile (globals.css)
+     so section content gets more width on narrow screens. */
+  --page-x: 32px;
 }

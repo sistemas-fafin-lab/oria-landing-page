@@ -174,7 +174,13 @@ export function UserMenu({ theme, onLoginClick, onSignupClick }: UserMenuProps) 
           style={{
             position: "fixed",
             top: buttonRect.bottom + 8,
-            left: buttonRect.left + (buttonRect.width / 2) - 140,
+            left: Math.max(
+              8,
+              Math.min(
+                buttonRect.left + buttonRect.width / 2 - 140,
+                (typeof window !== "undefined" ? window.innerWidth : 9999) - 280 - 8,
+              ),
+            ),
             width: 280,
             borderRadius: 16,
             background: "var(--bg-elevated)",

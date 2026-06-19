@@ -86,6 +86,7 @@ export function Nav({
         }}
       >
         <div
+          className="oria-nav-pill"
           style={{
             display: "flex",
             alignItems: "center",
@@ -192,8 +193,14 @@ export function Nav({
                 color="currentColor"
               />
             </button>
-            <Button variant="primary" size="sm" onClick={onSend}>
-              Enviar exame
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onSend}
+              className="oria-nav-cta"
+              aria-label="Enviar exame"
+            >
+              <span className="oria-nav-cta-label">Enviar exame</span>
               <Icon
                 name="arrow-up-right"
                 size={16}
@@ -352,7 +359,7 @@ export function Hero({ onSend }: { onSend: () => void }) {
           display: "grid",
           gridTemplateColumns: "1.05fr 0.95fr",
           gap: 56,
-          padding: "124px 32px 96px",
+          padding: "124px var(--page-x) 96px",
           alignItems: "center",
         }}
         className="oria-hero-grid"
@@ -368,7 +375,7 @@ export function Hero({ onSend }: { onSend: () => void }) {
           </Reveal>
           <Reveal appear delay={150}>
             <h1
-              className="oria-headline"
+              className="oria-headline oria-hero-title"
               style={{
                 fontSize: "var(--text-5xl)",
                 margin: "22px 0 0",
@@ -396,6 +403,7 @@ export function Hero({ onSend }: { onSend: () => void }) {
           </Reveal>
           <Reveal appear delay={350}>
             <div
+              className="oria-hero-cta"
               style={{
                 display: "flex",
                 gap: 14,
@@ -754,15 +762,6 @@ export function FilmSection() {
   const ref = React.useRef<HTMLDivElement>(null);
   const [inView, setInView] = React.useState(false);
   const [animated, setAnimated] = React.useState(false);
-  const [mobile, setMobile] = React.useState(false);
-
-  React.useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
-    setMobile(mq.matches);
-    const on = (e: MediaQueryListEvent) => setMobile(e.matches);
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
-  }, []);
 
   React.useEffect(() => {
     const el = ref.current;
@@ -841,7 +840,10 @@ export function FilmSection() {
         position: "relative",
         zIndex: 1,
         width: "100%",
-        aspectRatio: mobile ? "4 / 5" : "16 / 9",
+        /* The film canvas is a fixed 16:9 composition (contain-scaled), so the
+           wrapper must keep 16:9 on every breakpoint — a taller portrait ratio
+           only adds letterbox bars that read as gaps above/below the video. */
+        aspectRatio: "16 / 9",
         overflow: "hidden",
         marginTop: -28,
         marginBottom: -28,
@@ -900,7 +902,7 @@ export function Problem() {
         style={{
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
-          padding: "var(--space-10) 32px",
+          padding: "var(--space-10) var(--page-x)",
         }}
       >
         <Reveal>
@@ -1006,7 +1008,7 @@ export function Solution() {
           display: "grid",
           gridTemplateColumns: "1.1fr 0.9fr",
           gap: 48,
-          padding: "var(--space-10) 32px",
+          padding: "var(--space-10) var(--page-x)",
           alignItems: "center",
         }}
         className="oria-hero-grid"
@@ -1157,7 +1159,7 @@ export function HowItWorks() {
         style={{
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
-          padding: "var(--space-10) 32px",
+          padding: "var(--space-10) var(--page-x)",
         }}
       >
         <Reveal appear>
@@ -1601,7 +1603,7 @@ export function Benefits() {
           position: "relative",
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
-          padding: "var(--space-10) 32px",
+          padding: "var(--space-10) var(--page-x)",
         }}
       >
         <Reveal>
@@ -2112,11 +2114,12 @@ export function FinalCTA({
       style={{
         maxWidth: "var(--container-wide)",
         margin: "0 auto",
-        padding: "0 32px var(--space-10)",
+        padding: "0 var(--page-x) var(--space-10)",
       }}
     >
       <Reveal y={34}>
         <div
+          className="oria-final-cta"
           style={{
             position: "relative",
             overflow: "hidden",
@@ -2215,7 +2218,7 @@ export function Footer() {
           gridTemplateColumns:
             "1.2fr 0.8fr 0.8fr 1.1fr",
           gap: 40,
-          padding: "56px 32px",
+          padding: "56px var(--page-x)",
         }}
         className="oria-footer-grid"
       >
@@ -2245,6 +2248,7 @@ export function Footer() {
           ]}
         />
         <div
+          className="oria-footer-notice"
           style={{
             borderRadius: 20,
             border:

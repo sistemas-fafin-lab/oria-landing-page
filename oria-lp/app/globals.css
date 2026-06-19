@@ -18,6 +18,28 @@ body {
   font-family: var(--font-body);
 }
 
+/* ── Mobile-first guards ────────────────────────────────────── */
+/* Prevent stray horizontal scroll from decorative/overflowing art. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Narrower page gutters on small screens — gives sections more width
+   and keeps fixed-width visuals (e.g. the phone mockup) from clipping. */
+@media (max-width: 640px) {
+  :root { --page-x: 20px; }
+}
+@media (max-width: 380px) {
+  :root { --page-x: 16px; }
+}
+
 /* ── Cadastro/Login layout styles ───────────────────────────── */
 .oria-cad-shell {
   display: grid;
@@ -488,6 +510,81 @@ body {
   }
   .oria-node-stem {
     display: none !important;
+  }
+}
+
+/* ── Phone / tablet (≤ 600px) ─────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Stack the 4-up card grids into a single readable column. */
+  .oria-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+  /* Tighten the nav pill and drop the redundant CTA label (the same
+     "Enviar exame" action stays prominent in the hero + final CTA). */
+  .oria-nav-pill {
+    gap: 12px !important;
+    padding-left: 16px !important;
+  }
+  .oria-nav-cta-label {
+    display: none !important;
+  }
+  .oria-nav-cta {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  /* FinalCTA breathes better with lighter padding on phones. */
+  .oria-final-cta {
+    padding: 36px 22px !important;
+  }
+
+  /* Footer — compact on mobile. Logo + the "Aviso importante" notice span
+     full width (the notice reads short when wide instead of a tall column),
+     while the two link lists share a tidy 2-up row. */
+  .oria-footer-grid {
+    gap: 26px 18px !important;
+    padding: 40px var(--page-x) 36px !important;
+  }
+  .oria-footer-grid > :nth-child(1),
+  .oria-footer-grid > :nth-child(4) {
+    grid-column: 1 / -1 !important;
+  }
+  .oria-footer-notice {
+    padding: 14px 16px !important;
+  }
+}
+
+/* ── Hero phone mockup — scale the fixed-width scene to fit ────── */
+@media (max-width: 420px) {
+  .oria-hero-phone {
+    transform: scale(0.88);
+    transform-origin: top center;
+  }
+}
+@media (max-width: 360px) {
+  .oria-hero-phone {
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+}
+
+/* ── Ultra-narrow phones (≤400px: iPhone SE, Galaxy Z Fold cover) ──
+   The global type clamps floor out around here, so the hero headline and
+   CTAs need to keep shrinking. The title picks up a steeper vw slope and
+   the buttons stack full-width (the WhatsApp label is long — let it wrap
+   instead of overflowing). */
+@media (max-width: 400px) {
+  .oria-hero-title {
+    font-size: clamp(1.5rem, 0.5rem + 8.5vw, 2.7rem) !important;
+  }
+  .oria-hero-cta {
+    gap: 10px !important;
+  }
+  .oria-hero-cta > button {
+    width: 100% !important;
+    white-space: normal !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    font-size: var(--text-sm) !important;
   }
 }
 
