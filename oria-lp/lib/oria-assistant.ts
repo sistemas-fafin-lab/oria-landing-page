@@ -8,19 +8,76 @@
    nunca exposto ao cliente.
    ───────────────────────────────────────────────────────────── */
 
-/** Modelo padrão na Groq. Sobrescreva com GROQ_MODEL no .env.local. */
-export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+/* ── Provider config ──────────────────────────────────────────── */
 
-/** Endpoint compatível com OpenAI da Groq. */
+export interface AIConfig {
+  apiKey: string;
+  apiUrl: string;
+  model: string;
+}
+
+/** Provider principal. "gemini" | "groq". Padrão: gemini. */
+export const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini") as "gemini" | "groq";
+
+/** Google Gemini (OpenAI-compatible endpoint). Modelo principal. */
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
+export const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+
+/** Groq (fallback). */
+export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 export const GROQ_API_URL =
   "https://api.groq.com/openai/v1/chat/completions";
 
-/** Parâmetros de geração — calibrados para respostas claras e fiéis. */
-export const GENERATION = {
-  temperature: 0.55,
-  max_tokens: 900,
-  top_p: 0.9,
-} as const;
+/** Retorna a config do provider ativo (definido por AI_PROVIDER). */
+export function getAIConfig(): AIConfig {
+  if (AI_PROVIDER === "groq") {
+    return {
+      apiKey: process.env.GROQ_API_KEY || "",
+      apiUrl: GROQ_API_URL,
+      model: GROQ_MODEL,
+    };
+  }
+  // default: gemini
+  return {
+    apiKey: process.env.GEMINI_API_KEY || "",
+    apiUrl: GEMINI_API_URL,
+    model: GEMINI_MODEL,
+  };
+}
+
+/** Retorna a config do provider alternativo (para fallback). */
+export function getFallbackAIConfig(): AIConfig {
+  if (AI_PROVIDER === "groq") {
+    return {
+      apiKey: process.env.GEMINI_API_KEY || "",
+      apiUrl: GEMINI_API_URL,
+      model: GEMINI_MODEL,
+    };
+  }
+  return {
+    apiKey: process.env.GROQ_API_KEY || "",
+    apiUrl: GROQ_API_URL,
+    model: GROQ_MODEL,
+  };
+}
+
+/* ── Parâmetros de geração ───────────────────────────────────── */
+
+interface GenerationParams {
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+}
+
+/** Parâmetros ajustados por provider. Gemini tende a ser mais verboso. */
+export function getGeneration(): GenerationParams {
+  if (AI_PROVIDER === "groq") {
+    return { temperature: 0.55, max_tokens: 900, top_p: 0.9 };
+  }
+  // Gemini: respostas mais enxutas
+  return { temperature: 0.4, max_tokens: 420, top_p: 0.85 };
+}
 
 /** Quantas mensagens de histórico mantemos por conversa (controla custo/tokens). */
 export const MAX_HISTORY_MESSAGES = 14;
