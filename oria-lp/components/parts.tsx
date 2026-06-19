@@ -258,7 +258,14 @@ export function Button({
           background: "var(--oria-primary-deep)",
           boxShadow: "var(--shadow-premium-hover)",
         }
-      : { transform: "translateY(-2px)", background: "var(--accent-soft)" }
+      : variant === "inverse"
+        ? {
+            transform: "translateY(-2px)",
+            background:
+              "color-mix(in oklab, var(--oria-light-base) 88%, var(--oria-primary))",
+            boxShadow: "var(--shadow-premium-hover)",
+          }
+        : { transform: "translateY(-2px)", background: "var(--accent-soft)" }
     : {};
   return (
     <button

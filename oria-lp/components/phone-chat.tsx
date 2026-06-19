@@ -308,21 +308,21 @@ function ReportMini() {
     warn: { color: "#7d6320", bg: "#f3ecd6" },
   };
   return (
-    <div style={{ marginTop: 11, padding: 13, borderRadius: 14, background: "var(--oria-light-base)", color: "var(--oria-dark-base)", boxShadow: "0 8px 22px rgba(0,0,0,0.28)" }}>
+    <div style={{ marginTop: 11, padding: 13, borderRadius: 14, background: "var(--oria-light-base)", color: "#111715", boxShadow: "0 8px 22px rgba(0,0,0,0.28)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.16em", fontSize: 8.5, fontWeight: 700, color: "var(--oria-primary)" }}>Relatório ORIA</span>
         <Icon name="file-check" size={14} color="var(--oria-primary)" />
       </div>
-      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "-0.01em", margin: "4px 0 11px" }}>Resumo interpretativo</div>
+      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, letterSpacing: "-0.01em", margin: "4px 0 11px", color: "#111715" }}>Resumo interpretativo</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
         {rows.map((r) => (
           <div key={r.l} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 11.5, fontWeight: 500, color: "var(--text-secondary)" }}>{r.l}</span>
+            <span style={{ fontSize: 11.5, fontWeight: 500, color: "#4a514d" }}>{r.l}</span>
             <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: tones[r.tone].color, background: tones[r.tone].bg, borderRadius: 999, padding: "3px 9px" }}>{r.s}</span>
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 11, paddingTop: 10, borderTop: "1px solid var(--border-subtle)", fontSize: 10.5, color: "var(--text-muted)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 11, paddingTop: 10, borderTop: "1px solid rgba(17,23,21,0.12)", fontSize: 10.5, color: "#788171" }}>
         <Icon name="layers" size={12} color="var(--oria-muted)" />
         <span>12 marcadores analisados · histórico atualizado</span>
       </div>

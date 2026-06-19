@@ -296,6 +296,7 @@ export function OriaAssistant({
         {/* ── Mensagens ── */}
         <div
           ref={scrollRef}
+          className="oria-ai-scroll"
           style={{
             flex: 1,
             overflowY: "auto",
@@ -503,6 +504,34 @@ export function OriaAssistant({
             animation: none !important;
           }
         }
+
+        /* ── Premium scrollbar ── */
+        .oria-ai-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: var(--oria-sage) transparent;
+        }
+        .oria-ai-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .oria-ai-scroll::-webkit-scrollbar-track {
+          background: transparent;
+          margin: 4px 0;
+        }
+        .oria-ai-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(
+            180deg,
+            var(--oria-sage),
+            var(--oria-primary)
+          );
+          border-radius: 999px;
+        }
+        .oria-ai-scroll::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(
+            180deg,
+            var(--oria-primary),
+            var(--oria-primary-deep)
+          );
+        }
       `}</style>
     </div>
   );
@@ -537,10 +566,9 @@ function Avatar() {
         background: "rgba(255,255,255,0.12)",
         border: "1px solid rgba(255,255,255,0.22)",
         display: "inline-flex",
-        alignItems: "flex-end",
+        alignItems: "center",
         justifyContent: "center",
         gap: 3,
-        paddingBottom: 11,
       }}
     >
       <span
@@ -553,18 +581,6 @@ function Avatar() {
           background: "#dce7dd",
           borderRadius: 999,
           opacity: 0.8,
-        }}
-      />
-      <span
-        style={{
-          position: "absolute",
-          right: 1,
-          bottom: 1,
-          width: 10,
-          height: 10,
-          borderRadius: 999,
-          background: "#9fe6bd",
-          border: "2px solid var(--oria-primary)",
         }}
       />
     </span>

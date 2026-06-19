@@ -26,6 +26,14 @@ export default function Home() {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
   const openChat = () => setChatOpen(true);
 
+  const handleSendExam = () => {
+    window.open(
+      "https://wa.me/5561998126025?text=Ol%C3%A1%2C%20Oria!",
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
   const handleLoginClick = () => {
     router.push("/login");
   };
@@ -46,21 +54,21 @@ export default function Home() {
       }}
     >
       <Nav
-        onSend={openChat}
+        onSend={handleSendExam}
         theme={theme}
         toggleTheme={toggleTheme}
         onLoginClick={handleLoginClick}
         onSignupClick={handleSignupClick}
       />
       <main>
-        <Hero onSend={openChat} />
+        <Hero onSend={handleSendExam} />
         <FilmSection />
         <Problem />
         <Solution />
         <HowItWorks />
         <Benefits />
         <IsIsNot />
-        <FinalCTA onSend={openChat} />
+        <FinalCTA onSend={handleSendExam} />
       </main>
       <Footer />
 

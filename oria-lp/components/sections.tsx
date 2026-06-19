@@ -754,6 +754,15 @@ export function FilmSection() {
   const ref = React.useRef<HTMLDivElement>(null);
   const [inView, setInView] = React.useState(false);
   const [animated, setAnimated] = React.useState(false);
+  const [mobile, setMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setMobile(mq.matches);
+    const on = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
 
   React.useEffect(() => {
     const el = ref.current;
@@ -832,7 +841,7 @@ export function FilmSection() {
         position: "relative",
         zIndex: 1,
         width: "100%",
-        aspectRatio: "16 / 9",
+        aspectRatio: mobile ? "4 / 5" : "16 / 9",
         overflow: "hidden",
         marginTop: -28,
         marginBottom: -28,
