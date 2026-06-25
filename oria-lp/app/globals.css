@@ -89,6 +89,9 @@ body {
   to { transform: none; }
 }
 
+/* Stacked layout: brand panel on top, form below.
+   The brand copy is compacted so the form stays reachable, and the
+   form gutter gains top padding to clear the absolute back/theme controls. */
 @media (max-width: 920px) {
   .oria-cad-shell {
     grid-template-columns: 1fr;
@@ -100,10 +103,25 @@ body {
   .oria-cad-brand {
     min-height: auto !important;
     height: auto !important;
-    padding: 48px 32px 56px !important;
+    padding: 40px 32px 44px !important;
   }
   .oria-cad-floats {
     display: none !important;
+  }
+  .oria-cad-brand-title {
+    font-size: var(--text-2xl) !important;
+    margin-top: 16px !important;
+  }
+  .oria-cad-brand-text {
+    font-size: var(--text-sm) !important;
+    margin-top: 12px !important;
+  }
+  .oria-cad-brand-foot {
+    margin-top: 28px !important;
+    padding-top: 20px !important;
+  }
+  .oria-cad-form-wrap {
+    padding: 76px 40px 48px !important;
   }
 }
 
@@ -112,10 +130,49 @@ body {
     grid-template-columns: 1fr !important;
   }
   .oria-cad-form-wrap {
-    padding: 40px 24px 56px !important;
+    padding: 72px 22px 48px !important;
   }
   .oria-cad-brand {
-    padding: 40px 26px 48px !important;
+    padding: 34px 22px 38px !important;
+  }
+  .oria-cad-brand-title {
+    font-size: var(--text-xl) !important;
+  }
+  /* Stack the secondary/primary action pair, primary on top, full width. */
+  .oria-cad-actions {
+    flex-direction: column-reverse !important;
+    gap: 10px !important;
+  }
+  .oria-cad-actions > button {
+    width: 100% !important;
+  }
+  /* Let inline link rows wrap and center instead of clipping. */
+  .oria-cad-inline-links {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .oria-cad-form-wrap {
+    padding: 70px 16px 40px !important;
+  }
+  .oria-cad-brand {
+    padding: 30px 18px 34px !important;
+  }
+}
+
+/* Short side-by-side viewports (low window height on desktop): the shell is
+   locked to 100dvh, so drop the decorative float cards and tighten the form
+   gutters to keep the welcome copy fully visible without vertical scroll.
+   The brand copy/spacing already compresses via vh-aware clamps inline. */
+@media (min-width: 921px) and (max-height: 720px) {
+  .oria-cad-floats {
+    display: none !important;
+  }
+  .oria-cad-form-wrap {
+    padding-top: 36px !important;
+    padding-bottom: 36px !important;
   }
 }
 
@@ -635,10 +692,12 @@ body {
 
   /* SVG line travel pulse */
   .oria-line-travel {
-    animation: oria-line-travel 7s linear infinite;
+    animation: oria-line-travel 8s linear infinite;
   }
   @keyframes oria-line-travel {
-    from { stroke-dashoffset: 1140; }
+    /* Travel exactly one dash period (70 + 1000 = 1070) per loop so the
+       light flows continuously, with no backward jump at the seam. */
+    from { stroke-dashoffset: 1070; }
     to   { stroke-dashoffset: 0; }
   }
 
@@ -694,4 +753,463 @@ body {
     from { opacity: 0; transform: translateY(8px) scale(0.96); }
     to { opacity: 1; transform: none; }
   }
+}
+
+/* ── Keyboard navigation ─────────────────────────────────────── */
+/* Skip link — hidden off-screen until it receives focus (first Tab). */
+.oria-skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  transform: translateY(-160%);
+  background: var(--oria-primary);
+  color: #f4f2ee;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  box-shadow: var(--shadow-cta);
+  transition: transform 0.22s var(--ease-apple);
+}
+.oria-skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Keycap. */
+.oria-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 7px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-bottom-width: 2px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+/* Shared floating action button — rendered as the inverse of the page so the
+   chat and accessibility triggers look identical and flip with the theme:
+   dark theme → light button, light theme → dark button. */
+.oria-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-inverse);
+  color: var(--bg-base);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-premium);
+  transition: transform 0.2s var(--ease-apple),
+    box-shadow 0.2s var(--ease-apple), background 0.25s var(--ease-apple);
+}
+.oria-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-premium-hover);
+}
+.oria-fab:active {
+  transform: translateY(0);
+}
+
+/* Accessibility trigger — bottom-left placement. */
+.oria-kbd-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 130;
+}
+@media (max-width: 480px) {
+  .oria-kbd-fab {
+    bottom: 16px;
+    left: 16px;
+  }
+}
+
+/* Help dialog. */
+/* Light-dismiss scrim — transparent, so the page stays fully visible. */
+.oria-kbd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: transparent;
+}
+/* Popover anchored just above the floating trigger (bottom-left). */
+.oria-kbd-panel {
+  position: fixed;
+  bottom: 86px;
+  left: 24px;
+  z-index: 120;
+  width: 374px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 124px);
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-bento-sm);
+  box-shadow: var(--shadow-premium);
+  padding: 20px 20px 16px;
+  transform-origin: bottom left;
+  animation: oria-kbd-pop 0.26s var(--ease-spring) both;
+  scrollbar-width: thin;
+  scrollbar-color: var(--oria-sage) transparent;
+}
+.oria-kbd-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.oria-kbd-panel::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 10px 0;
+}
+.oria-kbd-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--oria-sage), var(--oria-primary));
+  border-radius: 999px;
+}
+.oria-kbd-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--oria-primary), var(--oria-primary-deep));
+}
+@keyframes oria-kbd-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@media (max-width: 480px) {
+  .oria-kbd-panel {
+    bottom: 78px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+  }
+}
+.oria-kbd-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.oria-kbd-panel-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.oria-kbd-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.2s var(--ease-apple), border-color 0.2s var(--ease-apple);
+}
+.oria-kbd-close:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+.oria-kbd-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.oria-kbd-group-head {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--oria-sage);
+  margin-bottom: 6px;
+}
+.oria-kbd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.oria-kbd-row:last-child {
+  border-bottom: none;
+}
+.oria-kbd-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.oria-kbd-keys {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.oria-kbd-foot {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* Tabs inside the dialog. */
+.oria-kbd-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 18px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+}
+.oria-kbd-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s var(--ease-apple), background 0.2s var(--ease-apple);
+}
+.oria-kbd-tab:hover {
+  color: var(--text-primary);
+}
+.oria-kbd-tab[aria-selected="true"] {
+  background: var(--oria-primary);
+  color: #f4f2ee;
+  box-shadow: var(--shadow-cta);
+}
+
+/* Accessibility controls. */
+.oria-a11y {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.oria-a11y-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+}
+.oria-a11y-block-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+.oria-a11y-block-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.oria-a11y-ic {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--accent-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.oria-a11y-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.oria-a11y-text strong {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.oria-a11y-text span {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* Pill switch. */
+.oria-a11y-switch {
+  flex-shrink: 0;
+  position: relative;
+  width: 46px;
+  height: 27px;
+  border-radius: 999px;
+  border: none;
+  background: color-mix(in oklab, var(--text-muted) 45%, transparent);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s var(--ease-apple);
+}
+.oria-a11y-switch[aria-checked="true"] {
+  background: var(--oria-primary);
+}
+.oria-a11y-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 999px;
+  background: #f4f2ee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: left 0.25s var(--ease-spring);
+}
+.oria-a11y-switch[aria-checked="true"] .oria-a11y-knob {
+  left: 22px;
+}
+
+/* Font-size stepper. */
+.oria-a11y-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.oria-a11y-step {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.18s var(--ease-apple), border-color 0.18s var(--ease-apple),
+    background 0.18s var(--ease-apple);
+}
+.oria-a11y-step:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.oria-a11y-step:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.oria-a11y-reset {
+  flex: 1;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.18s var(--ease-apple), border-color 0.18s var(--ease-apple);
+}
+.oria-a11y-reset:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.oria-a11y-note {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* Theme segmented control. */
+.oria-a11y-seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.oria-a11y-seg-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 11px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.18s var(--ease-apple), border-color 0.18s var(--ease-apple),
+    background 0.18s var(--ease-apple);
+}
+.oria-a11y-seg-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+.oria-a11y-seg-btn[aria-pressed="true"] {
+  background: var(--oria-primary);
+  border-color: transparent;
+  color: #f4f2ee;
+  box-shadow: var(--shadow-cta);
+}
+
+/* ── Accessibility preferences reflected from <html> ─────────── */
+html[data-font-size="small"] { font-size: 90%; }
+html[data-font-size="large"] { font-size: 110%; }
+html[data-font-size="extra-large"] { font-size: 122%; }
+
+html[data-high-contrast="true"],
+html[data-high-contrast="true"] .dark {
+  --text-secondary: var(--text-primary);
+  --text-muted: var(--text-primary);
+  --border-subtle: var(--border-default);
+  --border-default: var(--text-primary);
+}
+html[data-high-contrast="true"] a {
+  text-decoration: underline;
+}
+html[data-high-contrast="true"] *:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
 }

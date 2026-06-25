@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation";
 import { Icon, Logo, Button, Badge } from "../../components/parts";
 import { Reveal } from "../../components/motion";
 import { requestCode, verifyCode, login, setToken } from "../../lib/auth-client";
+import {
+  SkipLink,
+  ShortcutsButton,
+  ShortcutsOverlay,
+  useKeydown,
+  isTypingTarget,
+  type ShortcutGroup,
+} from "../../components/keyboard";
+import { useAccessibility } from "../../components/accessibility";
+import { useTheme } from "../../components/theme";
 
 /* ───────────── máscaras ───────────── */
 const cadDigits = (s: string) => (s || "").replace(/\D/g, "");
@@ -110,6 +120,10 @@ function Field({
             fontWeight: up ? 600 : 400,
             textTransform: up ? "uppercase" : "none",
             letterSpacing: up ? "0.13em" : "0.01em",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: up ? "calc(100% - 30px)" : "calc(100% - 48px)",
             color: error ? CAD_CLAY : focus ? "var(--oria-sage)" : "var(--text-muted)",
             transition: "all var(--dur-base) var(--ease-apple)",
           }}
@@ -143,7 +157,7 @@ function Field({
             outline: "none",
             boxShadow: focus ? "0 0 0 3px rgba(106,138,122,0.22)" : "none",
             fontFamily: "var(--font-body)",
-            fontSize: 15,
+            fontSize: 16,
             letterSpacing: "0.01em",
             transition:
               "border-color var(--dur-base) var(--ease-apple), box-shadow var(--dur-base) var(--ease-apple)",
@@ -244,6 +258,10 @@ function PasswordField({
             fontWeight: up ? 600 : 400,
             textTransform: up ? "uppercase" : "none",
             letterSpacing: up ? "0.13em" : "0.01em",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: up ? "calc(100% - 30px)" : "calc(100% - 48px)",
             color: error ? CAD_CLAY : focus ? "var(--oria-sage)" : "var(--text-muted)",
             transition: "all var(--dur-base) var(--ease-apple)",
           }}
@@ -275,7 +293,7 @@ function PasswordField({
             outline: "none",
             boxShadow: focus ? "0 0 0 3px rgba(106,138,122,0.22)" : "none",
             fontFamily: "var(--font-body)",
-            fontSize: 15,
+            fontSize: 16,
             letterSpacing: show ? "0.01em" : "0.12em",
             transition:
               "border-color var(--dur-base) var(--ease-apple), box-shadow var(--dur-base) var(--ease-apple)",
@@ -365,7 +383,7 @@ function OtpInput({ length = 6, value, onChange, error }: OtpInputProps) {
   };
 
   return (
-    <div style={{ display: "flex", gap: 10 }} onPaste={onPaste}>
+    <div style={{ display: "flex", gap: "clamp(6px, 2.2vw, 10px)", width: "100%" }} onPaste={onPaste}>
       {Array.from({ length }).map((_, i) => {
         const filled = !!value[i];
         return (
@@ -379,8 +397,10 @@ function OtpInput({ length = 6, value, onChange, error }: OtpInputProps) {
             onKeyDown={(e) => onKey(i, e)}
             aria-label={`Dígito ${i + 1}`}
             style={{
-              width: 52,
-              height: 60,
+              flex: "1 1 0",
+              minWidth: 0,
+              maxWidth: 56,
+              height: "clamp(52px, 13.5vw, 60px)",
               textAlign: "center",
               borderRadius: 16,
               background: "var(--bg-base)",
@@ -390,7 +410,7 @@ function OtpInput({ length = 6, value, onChange, error }: OtpInputProps) {
               }`,
               fontFamily: "var(--font-display)",
               fontWeight: 700,
-              fontSize: 24,
+              fontSize: "clamp(20px, 5.5vw, 24px)",
               outline: "none",
               transition: "all var(--dur-base) var(--ease-apple)",
               boxShadow: filled ? "0 0 0 3px rgba(106,138,122,0.16)" : "none",
@@ -470,21 +490,32 @@ function BrandLines() {
     <svg viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true" fill="none"
       style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
       <defs>
-        <filter id="oria-bl-glow" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="5" /></filter>
+        <filter id="oria-bl-glow" x="-10%" y="-60%" width="120%" height="220%">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
       </defs>
+      {/* faint static wires */}
       {paths.map((d, i) => (
         <path key={"b" + i} d={d} stroke="#bfe0cb" strokeWidth={i === 0 ? 1.5 : 1} opacity={i === 0 ? 0.34 : 0.2} />
       ))}
-      {paths.map((d, i) => (
-        <g key={"g" + i}>
-          <path className="oria-line-travel" style={{ animationDelay: `${i * -3.2}s`, animationDuration: `${7 + i * 1.6}s` }}
-            d={d} pathLength="1000" stroke="#eafaf0" strokeWidth={i === 0 ? 5 : 3.5} strokeLinecap="round"
-            filter="url(#oria-bl-glow)" strokeDasharray="70 1000" opacity={0.5} />
-          <path className="oria-line-travel" style={{ animationDelay: `${i * -3.2}s`, animationDuration: `${7 + i * 1.6}s` }}
-            d={d} pathLength="1000" stroke="#eafaf0" strokeWidth={i === 0 ? 1.6 : 1.2} strokeLinecap="round"
-            strokeDasharray="70 1000" opacity={0.9} />
-        </g>
-      ))}
+      {/* Traveling light — soft blurred glow + bright core, the same look used
+          by the landing's LivingLines. The dash period (70 + 1000 = 1070)
+          matches the keyframe travel distance, so the loop is seamless: the
+          light flows on without jumping back at the seam. A gentle breathe on
+          the group makes the glow pulse as it travels. */}
+      {paths.map((d, i) => {
+        const travel = { animationDelay: `${i * -3.7}s`, animationDuration: `${8 + i * 1.8}s` };
+        return (
+          <g key={"g" + i} className="oria-line-breathe">
+            <path className="oria-line-travel" style={travel} d={d} pathLength="1000"
+              stroke="#eafaf0" strokeWidth={i === 0 ? 5 : 3.5} strokeLinecap="round"
+              filter="url(#oria-bl-glow)" strokeDasharray="70 1000" opacity={0.5} />
+            <path className="oria-line-travel" style={travel} d={d} pathLength="1000"
+              stroke="#eafaf0" strokeWidth={i === 0 ? 1.6 : 1.2} strokeLinecap="round"
+              strokeDasharray="70 1000" opacity={0.9} />
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -504,7 +535,7 @@ const BrandPanel = memo(function BrandPanel() {
         overflow: "hidden",
         background: "linear-gradient(150deg,#1d4d3b,#0a3026)",
         color: "#f4f2ee",
-        padding: "56px 52px",
+        padding: "clamp(28px, 5vh, 56px) clamp(28px, 4vw, 52px)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -522,25 +553,25 @@ const BrandPanel = memo(function BrandPanel() {
 
       <div style={{ position: "relative" }}>
         <Logo tone="light" size={28} />
-        <div style={{ marginTop: 52 }}>
+        <div style={{ marginTop: "clamp(20px, 4.5vh, 52px)" }}>
           <div className="oria-rise" style={{ animationDelay: "60ms" }}>
             <Badge variant="onDark">Entrar</Badge>
           </div>
           <h1
-            className="oria-headline oria-rise"
-            style={{ animationDelay: "140ms", fontSize: "var(--text-4xl)", margin: "20px 0 0", maxWidth: 420 }}
+            className="oria-headline oria-rise oria-cad-brand-title"
+            style={{ animationDelay: "140ms", fontSize: "clamp(1.9rem, 1.1rem + 1.6vw + 1vh, 3.25rem)", margin: "clamp(12px, 2vh, 20px) 0 0", maxWidth: 420 }}
           >
             Bem-vindo de volta.
           </h1>
           <p
-            className="oria-rise"
+            className="oria-rise oria-cad-brand-text"
             style={{
               animationDelay: "230ms",
               fontSize: "var(--text-md)",
               lineHeight: 1.6,
               color: "rgba(244,242,238,0.78)",
               maxWidth: 400,
-              margin: "20px 0 0",
+              margin: "clamp(10px, 1.6vh, 20px) 0 0",
             }}
           >
             Acesse sua conta com seu telefone e continue acompanhando a história da sua saúde.
@@ -550,7 +581,7 @@ const BrandPanel = memo(function BrandPanel() {
 
       <div
         className="oria-cad-floats"
-        style={{ position: "relative", display: "flex", flexDirection: "column", gap: 14, marginTop: 44, paddingTop: 0 }}
+        style={{ position: "relative", display: "flex", flexDirection: "column", gap: "clamp(8px, 1.4vh, 14px)", marginTop: "clamp(16px, 3vh, 44px)", paddingTop: 0 }}
       >
         {floats.map((f, i) => (
           <div key={f.t} className="oria-rise" style={{ animationDelay: `${360 + i * 120}ms` }}>
@@ -596,10 +627,11 @@ const BrandPanel = memo(function BrandPanel() {
       </div>
 
       <div
+        className="oria-cad-brand-foot"
         style={{
           position: "relative",
           marginTop: "auto",
-          paddingTop: 28,
+          paddingTop: "clamp(14px, 2.2vh, 28px)",
           display: "flex",
           alignItems: "center",
           gap: 9,
@@ -613,6 +645,28 @@ const BrandPanel = memo(function BrandPanel() {
     </div>
   );
 });
+
+/* ───────────── atalhos de teclado ───────────── */
+const AUTH_SHORTCUTS: ShortcutGroup[] = [
+  {
+    heading: "Formulário",
+    items: [
+      { keys: ["Enter"], label: "Avançar / confirmar" },
+      { keys: ["Esc"], label: "Voltar à etapa anterior" },
+    ],
+  },
+  {
+    heading: "Código de verificação",
+    items: [
+      { keys: ["←", "→"], label: "Mover entre os dígitos" },
+      { keys: ["Backspace"], label: "Apagar o dígito anterior" },
+    ],
+  },
+  {
+    heading: "Geral",
+    items: [{ keys: ["?"], label: "Mostrar/ocultar esta ajuda" }],
+  },
+];
 
 /* ───────────── app de login ───────────── */
 export default function LoginPage() {
@@ -630,19 +684,12 @@ export default function LoginPage() {
   const [codeErr, setCodeErr] = useState<string | null>(null);
   const [resend, setResend] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const { shortcutsEnabled } = useAccessibility();
 
-  // tema (claro/escuro) — persistido e compartilhado com a tela de cadastro
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("oria_auth_theme") : null;
-    if (saved === "light" || saved === "dark") setTheme(saved);
-  }, []);
-  const toggleTheme = () =>
-    setTheme((t) => {
-      const next = t === "dark" ? "light" : "dark";
-      if (typeof window !== "undefined") localStorage.setItem("oria_auth_theme", next);
-      return next;
-    });
+  // tema global (claro/escuro/sistema) — compartilhado com todo o site
+  const { isDark, toggle: toggleTheme } = useTheme();
+  const theme = isDark ? "dark" : "light";
 
   const vals = { telefone: cadValPhone };
 
@@ -746,6 +793,27 @@ export default function LoginPage() {
     }
   };
 
+  useKeydown((e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "Escape") {
+      if (helpOpen) { setHelpOpen(false); return; }
+      if (!shortcutsEnabled) return;
+      if (step === "otp" || step === "senha") { e.preventDefault(); setStep("phone"); }
+      return;
+    }
+    if (!shortcutsEnabled) return;
+    if (isTypingTarget(e.target)) {
+      if (e.key === "Enter" && step !== "done") {
+        e.preventDefault();
+        if (step === "phone") proceedPhone();
+        else if (step === "otp") handleVerifyCode();
+        else if (step === "senha") submitSenha();
+      }
+      return;
+    }
+    if (e.key === "?") { e.preventDefault(); setHelpOpen((o) => !o); }
+  });
+
   const stepNum = step === "senha" ? 2 : 1;
   const labels = {
     phone: "Acesse sua conta",
@@ -766,13 +834,16 @@ export default function LoginPage() {
 
   return (
     <div className={theme === "dark" ? "dark" : ""} style={{ background: "var(--bg-base)", color: "var(--text-primary)", minHeight: "100vh" }}>
+      <SkipLink targetId="conteudo" />
       <div className="oria-cad-shell" style={{ display: "grid", gridTemplateColumns: "0.92fr 1.08fr", minHeight: "100vh" }}>
         <BrandPanel />
 
         {/* lado do formulário */}
         <div
+          id="conteudo"
+          tabIndex={-1}
           className="oria-cad-form-wrap"
-          style={{ display: "flex", flexDirection: "column", padding: "56px 64px", position: "relative" }}
+          style={{ display: "flex", flexDirection: "column", padding: "56px 64px", position: "relative", outline: "none" }}
         >
           <button
             onClick={() => router.push("/")}
@@ -953,7 +1024,7 @@ export default function LoginPage() {
                   onBlur={blurSenha}
                   error={touched.senha ? errors.senha : null}
                 />
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: -4 }}>
+                <div className="oria-cad-inline-links" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: -4 }}>
                   <button type="button" onClick={sendCode} style={authLink}>
                     Entrar com código
                   </button>
@@ -961,7 +1032,7 @@ export default function LoginPage() {
                     Esqueci minha senha
                   </button>
                 </div>
-                <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
                   <Button variant="secondary" size="lg" type="button" onClick={() => setStep("phone")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
@@ -1035,6 +1106,13 @@ export default function LoginPage() {
           )}
         </div>
       </div>
+
+      <ShortcutsButton onClick={() => setHelpOpen((o) => !o)} />
+      <ShortcutsOverlay
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        groups={AUTH_SHORTCUTS}
+      />
     </div>
   );
 }

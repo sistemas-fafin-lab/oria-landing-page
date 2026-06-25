@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "../components/theme";
+import { AccessibilityProvider } from "../components/accessibility";
 
 export const metadata: Metadata = {
   title: "ORIA — Saúde inteligente",
@@ -14,7 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <ThemeProvider>
+          <AccessibilityProvider>{children}</AccessibilityProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

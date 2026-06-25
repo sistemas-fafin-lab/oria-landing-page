@@ -26,6 +26,7 @@ import {
   LogIn,
   MessageCircle,
   Mic,
+  Monitor,
   Moon,
   Paperclip,
   Phone,
@@ -44,6 +45,11 @@ import {
   Video,
   Wifi,
   X,
+  PersonStanding,
+  Keyboard,
+  Type,
+  Minus,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 
@@ -72,6 +78,7 @@ const iconMap: Record<string, LucideIcon> = {
   "log-in": LogIn,
   "message-circle": MessageCircle,
   mic: Mic,
+  monitor: Monitor,
   moon: Moon,
   paperclip: Paperclip,
   phone: Phone,
@@ -92,6 +99,11 @@ const iconMap: Record<string, LucideIcon> = {
   video: Video,
   wifi: Wifi,
   x: X,
+  "person-standing": PersonStanding,
+  keyboard: Keyboard,
+  type: Type,
+  minus: Minus,
+  "rotate-ccw": RotateCcw,
 };
 
 export function Icon({
