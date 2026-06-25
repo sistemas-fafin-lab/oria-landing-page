@@ -149,34 +149,36 @@ export function ShortcutsOverlay({
           </button>
         </div>
 
-        {tab === "a11y" ? (
-          <AccessibilityPanel />
-        ) : (
-          <>
-            <div className="oria-kbd-groups">
-              {groups.map((g, gi) => (
-                <div key={gi} className="oria-kbd-group">
-                  {g.heading && (
-                    <div className="oria-kbd-group-head">{g.heading}</div>
-                  )}
-                  {g.items.map((it, ii) => (
-                    <div key={ii} className="oria-kbd-row">
-                      <span className="oria-kbd-label">{it.label}</span>
-                      <span className="oria-kbd-keys">
-                        {it.keys.map((k, ki) => (
-                          <Kbd key={ki}>{k}</Kbd>
-                        ))}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-            <div className="oria-kbd-foot">
-              Pressione <Kbd>Esc</Kbd> para fechar
-            </div>
-          </>
-        )}
+        <div className="oria-kbd-body">
+          {tab === "a11y" ? (
+            <AccessibilityPanel />
+          ) : (
+            <>
+              <div className="oria-kbd-groups">
+                {groups.map((g, gi) => (
+                  <div key={gi} className="oria-kbd-group">
+                    {g.heading && (
+                      <div className="oria-kbd-group-head">{g.heading}</div>
+                    )}
+                    {g.items.map((it, ii) => (
+                      <div key={ii} className="oria-kbd-row">
+                        <span className="oria-kbd-label">{it.label}</span>
+                        <span className="oria-kbd-keys">
+                          {it.keys.map((k, ki) => (
+                            <Kbd key={ki}>{k}</Kbd>
+                          ))}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="oria-kbd-foot">
+                Pressione <Kbd>Esc</Kbd> para fechar
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   );

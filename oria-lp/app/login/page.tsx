@@ -685,6 +685,9 @@ export default function LoginPage() {
   const [resend, setResend] = useState(0);
   const [loading, setLoading] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  // JWT devolvido pelo login (senha válida) — só é persistido após
+  // o usuário confirmar o token do WhatsApp. Login = senha + token.
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
   const { shortcutsEnabled } = useAccessibility();
 
   // tema global (claro/escuro/sistema) — compartilhado com todo o site
@@ -735,25 +738,15 @@ export default function LoginPage() {
     if (!err) setStep("senha");
   };
 
-  const sendCode = async () => {
-    const err = cadValPhone(data.telefone);
-    setTouched((s) => ({ ...s, telefone: true }));
-    setErrors((s) => ({ ...s, telefone: err }));
-    if (err) return;
-
-    setLoading(true);
-    const result = await requestCode(data.telefone);
-    setLoading(false);
-
-    if (!result.ok) {
-      setErrors((s) => ({ ...s, telefone: result.error || "Erro ao enviar código" }));
-      return;
-    }
-
+  // Reenvia o token do WhatsApp dentro do passo de verificação.
+  const resendCode = async () => {
+    setResend(30);
     setCode("");
     setCodeErr(null);
-    setResend(30);
-    setStep("otp");
+    const result = await requestCode(data.telefone);
+    if (!result.ok) {
+      setCodeErr(result.error || "Erro ao reenviar código");
+    }
   };
 
   const handleVerifyCode = async () => {
@@ -771,26 +764,50 @@ export default function LoginPage() {
       return;
     }
 
+    // Senha já foi validada; só agora, com o token confirmado, a sessão é criada.
+    if (!pendingToken) {
+      setCodeErr("Sessão expirada. Refaça o login com sua senha.");
+      setStep("senha");
+      return;
+    }
+
+    setToken(pendingToken);
     setCodeErr(null);
     setStep("done");
   };
 
+  // Login = senha + token. Validamos a senha primeiro; o JWT fica retido
+  // até o token do WhatsApp ser confirmado no passo seguinte.
   const submitSenha = async () => {
     const e1 = data.senha ? null : "Digite sua senha.";
     setTouched((s) => ({ ...s, senha: true }));
     setErrors((s) => ({ ...s, senha: e1 }));
-    if (!e1) {
-      setLoading(true);
-      const result = await login(data.telefone, data.senha);
-      setLoading(false);
+    if (e1) return;
 
-      if (result.ok && result.user?.token) {
-        setToken(result.user.token);
-        setStep("done");
-      } else {
-        setErrors((s) => ({ ...s, senha: result.error || "Credenciais inválidas" }));
-      }
+    setLoading(true);
+
+    // 1. Verifica a senha (não persiste o token ainda).
+    const result = await login(data.telefone, data.senha);
+    if (!result.ok || !result.user?.token) {
+      setLoading(false);
+      setErrors((s) => ({ ...s, senha: result.error || "Credenciais inválidas" }));
+      return;
     }
+    setPendingToken(result.user.token);
+
+    // 2. Envia o token de autenticação pelo WhatsApp.
+    const codeResult = await requestCode(data.telefone);
+    setLoading(false);
+
+    if (!codeResult.ok) {
+      setErrors((s) => ({ ...s, senha: codeResult.error || "Erro ao enviar código" }));
+      return;
+    }
+
+    setCode("");
+    setCodeErr(null);
+    setResend(30);
+    setStep("otp");
   };
 
   useKeydown((e) => {
@@ -798,7 +815,8 @@ export default function LoginPage() {
     if (e.key === "Escape") {
       if (helpOpen) { setHelpOpen(false); return; }
       if (!shortcutsEnabled) return;
-      if (step === "otp" || step === "senha") { e.preventDefault(); setStep("phone"); }
+      if (step === "otp") { e.preventDefault(); setStep("senha"); }
+      else if (step === "senha") { e.preventDefault(); setStep("phone"); }
       return;
     }
     if (!shortcutsEnabled) return;
@@ -814,7 +832,7 @@ export default function LoginPage() {
     if (e.key === "?") { e.preventDefault(); setHelpOpen((o) => !o); }
   });
 
-  const stepNum = step === "senha" ? 2 : 1;
+  const stepNum = step === "senha" ? 2 : step === "otp" ? 3 : 1;
   const labels = {
     phone: "Acesse sua conta",
     otp: "Verifique seu número",
@@ -914,7 +932,7 @@ export default function LoginPage() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ width: "100%", maxWidth: 460, margin: "0 auto" }}>
             {step !== "done" && (
-              <StepHeader step={stepNum} total={2} label={labels[step]} showSteps={false} />
+              <StepHeader step={stepNum} total={3} label={labels[step]} showSteps={false} />
             )}
 
             {/* PASSO 1 — telefone */}
@@ -951,8 +969,8 @@ export default function LoginPage() {
             {step === "otp" && (
               <div className="oria-step-enter" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--text-secondary)", margin: "-8px 0 0" }}>
-                  Enviamos um código de 6 dígitos para{" "}
-                  <strong style={{ color: "var(--text-primary)" }}>{data.telefone}</strong>.
+                  Senha confirmada. Enviamos um código de 6 dígitos para{" "}
+                  <strong style={{ color: "var(--text-primary)" }}>{data.telefone}</strong> para concluir seu acesso.
                   <button
                     type="button"
                     onClick={() => setStep("phone")}
@@ -975,10 +993,7 @@ export default function LoginPage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => {
-                        setResend(30);
-                        setCode("");
-                      }}
+                      onClick={resendCode}
                       style={{ background: "none", border: "none", color: "var(--oria-sage)", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "var(--font-body)" }}
                     >
                       Reenviar código
@@ -1024,10 +1039,7 @@ export default function LoginPage() {
                   onBlur={blurSenha}
                   error={touched.senha ? errors.senha : null}
                 />
-                <div className="oria-cad-inline-links" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: -4 }}>
-                  <button type="button" onClick={sendCode} style={authLink}>
-                    Entrar com código
-                  </button>
+                <div className="oria-cad-inline-links" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 12, marginTop: -4 }}>
                   <button type="button" onClick={() => {}} style={authLink}>
                     Esqueci minha senha
                   </button>

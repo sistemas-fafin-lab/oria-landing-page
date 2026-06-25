@@ -800,9 +800,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Shared floating action button — rendered as the inverse of the page so the
-   chat and accessibility triggers look identical and flip with the theme:
-   dark theme → light button, light theme → dark button. */
+/* Shared floating action button.
+   Light theme: deep forest green gradient — visible on both light and dark sections.
+   Dark theme: warm sand gradient — glows over dark backgrounds. */
 .oria-fab {
   width: 52px;
   height: 52px;
@@ -810,20 +810,41 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-inverse);
-  color: var(--bg-base);
-  border: none;
+  background: linear-gradient(145deg, #2a6a50 0%, #1d4d3b 55%, #0f3828 100%);
+  color: var(--oria-light-base);
+  border: 1.5px solid rgba(255, 255, 255, 0.10);
   cursor: pointer;
-  box-shadow: var(--shadow-premium);
-  transition: transform 0.2s var(--ease-apple),
-    box-shadow 0.2s var(--ease-apple), background 0.25s var(--ease-apple);
+  box-shadow:
+    0 4px 16px rgba(29, 77, 59, 0.45),
+    0 0 0 1px rgba(159, 230, 189, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  transition: transform 0.2s var(--ease-apple), box-shadow 0.2s var(--ease-apple);
 }
 .oria-fab:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-premium-hover);
+  box-shadow:
+    0 8px 26px rgba(29, 77, 59, 0.55),
+    0 0 0 1.5px rgba(159, 230, 189, 0.30),
+    0 1px 0 rgba(255, 255, 255, 0.14) inset;
 }
 .oria-fab:active {
   transform: translateY(0);
+}
+.dark .oria-fab,
+[data-theme="dark"] .oria-fab {
+  background: linear-gradient(145deg, #ece9e2 0%, #ddd8cc 100%);
+  color: var(--oria-primary);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.60),
+    0 1px 0 rgba(255, 255, 255, 0.28) inset;
+}
+.dark .oria-fab:hover,
+[data-theme="dark"] .oria-fab:hover {
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.70),
+    0 0 0 1.5px rgba(159, 230, 189, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.28) inset;
 }
 
 /* Accessibility trigger — bottom-left placement. */
@@ -848,7 +869,8 @@ body {
   z-index: 110;
   background: transparent;
 }
-/* Popover anchored just above the floating trigger (bottom-left). */
+/* Popover anchored just above the floating trigger (bottom-left).
+   overflow: hidden clips the inner scroll body within the rounded corners. */
 .oria-kbd-panel {
   position: fixed;
   bottom: 86px;
@@ -857,30 +879,40 @@ body {
   width: 374px;
   max-width: calc(100vw - 32px);
   max-height: calc(100dvh - 124px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-bento-sm);
   box-shadow: var(--shadow-premium);
-  padding: 20px 20px 16px;
+  padding: 20px 20px 0;
   transform-origin: bottom left;
   animation: oria-kbd-pop 0.26s var(--ease-spring) both;
+}
+/* Scrollable body — negative margin extends edge-to-edge so the
+   scrollbar sits flush with the panel edge, not inside the padding. */
+.oria-kbd-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -20px;
+  padding: 0 20px 16px;
   scrollbar-width: thin;
-  scrollbar-color: var(--oria-sage) transparent;
+  scrollbar-color: color-mix(in oklab, var(--oria-sage) 48%, transparent) transparent;
 }
-.oria-kbd-panel::-webkit-scrollbar {
-  width: 6px;
+.oria-kbd-body::-webkit-scrollbar {
+  width: 4px;
 }
-.oria-kbd-panel::-webkit-scrollbar-track {
+.oria-kbd-body::-webkit-scrollbar-track {
   background: transparent;
-  margin: 10px 0;
 }
-.oria-kbd-panel::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--oria-sage), var(--oria-primary));
+.oria-kbd-body::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--oria-sage) 45%, transparent);
   border-radius: 999px;
 }
-.oria-kbd-panel::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--oria-primary), var(--oria-primary-deep));
+.oria-kbd-body::-webkit-scrollbar-thumb:hover {
+  background: var(--oria-sage);
 }
 @keyframes oria-kbd-pop {
   from { opacity: 0; transform: translateY(12px) scale(0.96); }
@@ -896,6 +928,7 @@ body {
   }
 }
 .oria-kbd-panel-head {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -974,6 +1007,7 @@ body {
 
 /* Tabs inside the dialog. */
 .oria-kbd-tabs {
+  flex-shrink: 0;
   display: flex;
   gap: 4px;
   padding: 4px;
