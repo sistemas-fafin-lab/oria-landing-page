@@ -971,9 +971,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={theme === "dark" ? "dark" : ""} style={{ background: "var(--bg-base)", color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div className={`oria-auth-page ${theme === "dark" ? "dark" : ""}`} style={{ background: "var(--bg-base)", color: "var(--text-primary)", minHeight: "100vh" }}>
       <SkipLink targetId="conteudo" />
-      <div className="oria-cad-shell" style={{ display: "grid", gridTemplateColumns: "0.92fr 1.08fr", minHeight: "100vh" }}>
+      <div className="oria-cad-shell" style={{ minHeight: "100vh" }}>
         <BrandPanel />
 
         {/* lado do formulário */}
@@ -983,9 +983,50 @@ export default function LoginPage() {
           className="oria-cad-form-wrap"
           style={{ display: "flex", flexDirection: "column", padding: "56px 64px", position: "relative", outline: "none" }}
         >
+          {/* Slim brand topbar — mobile only (hidden ≥921px via CSS) */}
+          <header className="oria-cad-topbar">
+            <div className="oria-cad-topbar-side">
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                aria-label="Voltar para página inicial"
+                className="oria-cad-topbar-btn"
+              >
+                <Icon name="chevron-left" size={20} color="currentColor" />
+              </button>
+            </div>
+            <Logo tone={isDark ? "light" : "primary"} size={22} />
+            <div className="oria-cad-topbar-side oria-cad-topbar-side-end">
+              <button
+                type="button"
+                onClick={() => setHelpOpen((o) => !o)}
+                aria-label="Acessibilidade e atalhos de teclado"
+                title="Acessibilidade"
+                className="oria-cad-topbar-btn"
+              >
+                <Icon name="person-standing" size={20} color="currentColor" />
+              </button>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+                className="oria-cad-topbar-btn"
+              >
+                <Icon name={theme === "dark" ? "sun" : "moon"} size={19} color="currentColor" />
+              </button>
+            </div>
+          </header>
+          {/* Premium backdrop (traveling lines + lighting) — mobile only */}
+          <div className="oria-cad-mobile-bg" aria-hidden="true">
+            <Glow style={{ top: -120, right: -90, width: 380, height: 380, opacity: 0.5 }} />
+            <Glow style={{ bottom: 90, left: -110, width: 320, height: 320, opacity: 0.35 }} color="rgba(159,230,189,0.22)" />
+            <BrandLines />
+          </div>
           <button
             onClick={() => router.push("/")}
             aria-label="Voltar para página inicial"
+            className="oria-cad-floatbtn"
             style={{
               position: "absolute",
               top: 24,
@@ -1019,6 +1060,7 @@ export default function LoginPage() {
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
             title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+            className="oria-cad-floatbtn"
             style={{
               position: "absolute",
               top: 24,
@@ -1049,7 +1091,7 @@ export default function LoginPage() {
           >
             <Icon name={theme === "dark" ? "sun" : "moon"} size={19} color="currentColor" />
           </button>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <div className="oria-cad-form-center" style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ width: "100%", maxWidth: 460, margin: "0 auto" }}>
             {step !== "done" && (
               <StepHeader
@@ -1078,10 +1120,12 @@ export default function LoginPage() {
                   valid={okTelefone}
                   helper="Use o telefone cadastrado para entrar com sua senha."
                 />
-                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 6 }} onClick={proceedPhone}>
-                  Continuar
-                  <Icon name="arrow-up-right" size={18} color="#f4f2ee" />
-                </Button>
+                <div className="oria-cad-cta">
+                  <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 6 }} onClick={proceedPhone}>
+                    Continuar
+                    <Icon name="arrow-up-right" size={18} color="#f4f2ee" />
+                  </Button>
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: "var(--text-muted)", justifyContent: "center", marginTop: 4 }}>
                   <span>Não tem conta?</span>
                   <button type="button" onClick={() => router.push("/signup")} style={authLink}>
@@ -1107,17 +1151,19 @@ export default function LoginPage() {
                 </p>
                 <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
                 {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
-                <Button
-                  variant="primary"
-                  size="lg"
-                  type="button"
-                  style={{ width: "100%", marginTop: 2 }}
-                  loading={loading}
-                  onClick={handleVerifyCode}
-                  iconRight={<Icon name="log-in" size={18} color="#f4f2ee" />}
-                >
-                  {loading ? "Entrando..." : "Entrar"}
-                </Button>
+                <div className="oria-cad-cta">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    type="button"
+                    style={{ width: "100%", marginTop: 2 }}
+                    loading={loading}
+                    onClick={handleVerifyCode}
+                    iconRight={<Icon name="log-in" size={18} color="#f4f2ee" />}
+                  >
+                    {loading ? "Entrando..." : "Entrar"}
+                  </Button>
+                </div>
                 <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
                   {resend > 0 ? (
                     <span>
@@ -1215,7 +1261,7 @@ export default function LoginPage() {
                         : "Esqueci minha senha"}
                   </button>
                 </div>
-                <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                <div className="oria-cad-actions oria-cad-cta" style={{ display: "flex", gap: 12, marginTop: 8 }}>
                   <Button variant="secondary" size="lg" type="button" disabled={loading || resetLoading} onClick={() => setStep("phone")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
@@ -1252,17 +1298,19 @@ export default function LoginPage() {
                 </p>
                 <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
                 {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
-                <Button
-                  variant="primary"
-                  size="lg"
-                  type="button"
-                  style={{ width: "100%", marginTop: 2 }}
-                  loading={loading}
-                  onClick={verifyResetCode}
-                  iconRight={<Icon name="shield-check" size={18} color="#f4f2ee" />}
-                >
-                  {loading ? "Verificando..." : "Verificar e continuar"}
-                </Button>
+                <div className="oria-cad-cta">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    type="button"
+                    style={{ width: "100%", marginTop: 2 }}
+                    loading={loading}
+                    onClick={verifyResetCode}
+                    iconRight={<Icon name="shield-check" size={18} color="#f4f2ee" />}
+                  >
+                    {loading ? "Verificando..." : "Verificar e continuar"}
+                  </Button>
+                </div>
                 <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
                   {resend > 0 ? (
                     <span>
@@ -1330,7 +1378,7 @@ export default function LoginPage() {
                   }
                   error={resetErr.confirm}
                 />
-                <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                <div className="oria-cad-actions oria-cad-cta" style={{ display: "flex", gap: 12, marginTop: 8 }}>
                   <Button variant="secondary" size="lg" type="button" disabled={loading} onClick={() => setStep("senha")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
@@ -1405,8 +1453,14 @@ export default function LoginPage() {
           </div>
 
           {step !== "done" && (
-            <div style={{ paddingTop: 24, textAlign: "center", fontSize: 12, color: "var(--text-muted)", flexShrink: 0 }}>
-              © 2026 ORIA · Saúde inteligente
+            <div style={{ flexShrink: 0 }}>
+              <div className="oria-cad-trust">
+                <Icon name="lock" size={13} color="var(--oria-sage)" style={{ marginTop: 2, flexShrink: 0 }} />
+                <span>A ORIA não fornece diagnóstico médico nem substitui a consulta com profissionais de saúde.</span>
+              </div>
+              <div style={{ paddingTop: 24, textAlign: "center", fontSize: 12, color: "var(--text-muted)" }}>
+                © 2026 ORIA · Saúde inteligente
+              </div>
             </div>
           )}
         </div>
