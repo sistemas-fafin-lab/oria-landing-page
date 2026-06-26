@@ -22,6 +22,7 @@ import {
   IdCard,
   Info,
   Layers,
+  LoaderCircle,
   Lock,
   LogIn,
   MessageCircle,
@@ -74,6 +75,7 @@ const iconMap: Record<string, LucideIcon> = {
   "id-card": IdCard,
   info: Info,
   layers: Layers,
+  "loader-circle": LoaderCircle,
   lock: Lock,
   "log-in": LogIn,
   "message-circle": MessageCircle,
@@ -112,17 +114,20 @@ export function Icon({
   color = "currentColor",
   strokeWidth = 1.75,
   style = {},
+  className,
 }: {
   name: string;
   size?: number;
   color?: string;
   strokeWidth?: number;
   style?: React.CSSProperties;
+  className?: string;
 }) {
   const LucideComponent = iconMap[name];
   if (!LucideComponent) return null;
   return (
     <span
+      className={className}
       style={{ display: "inline-flex", width: size, height: size, ...style }}
       aria-hidden="true"
     >
@@ -251,6 +256,8 @@ export function Button({
   children,
   iconLeft,
   iconRight,
+  loading = false,
+  disabled,
   style = {},
   ...rest
 }: {
@@ -259,11 +266,14 @@ export function Button({
   children: React.ReactNode;
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
+  loading?: boolean;
   style?: React.CSSProperties;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const [hover, setHover] = React.useState(false);
   const base = buttonVariants[variant];
-  const hoverStyle = hover
+  // `loading` implies disabled: blocks repeated clicks while an async action runs.
+  const isDisabled = loading || !!disabled;
+  const hoverStyle = hover && !isDisabled
     ? variant === "primary"
       ? {
           transform: "translateY(-2px)",
@@ -279,8 +289,13 @@ export function Button({
           }
         : { transform: "translateY(-2px)", background: "var(--accent-soft)" }
     : {};
+  const spinner = (
+    <Icon name="loader-circle" size={18} color="currentColor" className="oria-spin-inline" />
+  );
   return (
     <button
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -292,10 +307,11 @@ export function Button({
         fontFamily: "var(--font-body)",
         fontWeight: 600,
         letterSpacing: "0.01em",
-        cursor: "pointer",
+        cursor: isDisabled ? "not-allowed" : "pointer",
+        opacity: isDisabled ? 0.6 : 1,
         whiteSpace: "nowrap",
         transition:
-          "transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-apple), background var(--dur-base) var(--ease-apple)",
+          "transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-apple), background var(--dur-base) var(--ease-apple), opacity var(--dur-base) var(--ease-apple)",
         ...buttonSizes[size],
         ...base,
         ...hoverStyle,
@@ -303,9 +319,9 @@ export function Button({
       }}
       {...rest}
     >
-      {iconLeft}
+      {loading ? spinner : iconLeft}
       {children}
-      {iconRight}
+      {loading ? null : iconRight}
     </button>
   );
 }

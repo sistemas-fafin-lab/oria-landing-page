@@ -703,6 +703,10 @@ export default function LoginPage() {
   const [resetSenhaConfirm, setResetSenhaConfirm] = useState("");
   const [resetErr, setResetErr] = useState<{ senha?: string | null; confirm?: string | null }>({});
   const [resetOk, setResetOk] = useState(false);
+  // cooldown (segundos) do botão "Esqueci minha senha" — evita reenvios em sequência
+  const [resetCooldown, setResetCooldown] = useState(0);
+  // loading dedicado ao envio do reset, para não afetar o botão "Entrar"
+  const [resetLoading, setResetLoading] = useState(false);
   const { shortcutsEnabled } = useAccessibility();
 
   // tema global (claro/escuro/sistema) — compartilhado com todo o site
@@ -746,6 +750,13 @@ export default function LoginPage() {
     return () => clearTimeout(t);
   }, [resend]);
 
+  // cooldown do "Esqueci minha senha"
+  useEffect(() => {
+    if (resetCooldown <= 0) return;
+    const t = setTimeout(() => setResetCooldown((r) => r - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resetCooldown]);
+
   const proceedPhone = () => {
     const err = cadValPhone(data.telefone);
     setTouched((s) => ({ ...s, telefone: true }));
@@ -766,6 +777,7 @@ export default function LoginPage() {
   };
 
   const handleVerifyCode = async () => {
+    if (loading) return;
     if (code.length < 6) {
       setCodeErr("Digite os 6 dígitos do código.");
       return;
@@ -795,6 +807,7 @@ export default function LoginPage() {
   // Login = senha + token. Validamos a senha primeiro; o JWT fica retido
   // até o token do WhatsApp ser confirmado no passo seguinte.
   const submitSenha = async () => {
+    if (loading) return;
     const e1 = data.senha ? null : "Digite sua senha.";
     setTouched((s) => ({ ...s, senha: true }));
     setErrors((s) => ({ ...s, senha: e1 }));
@@ -828,6 +841,8 @@ export default function LoginPage() {
 
   // "Esqueci minha senha": dispara a OTP do WhatsApp e abre o fluxo de redefinição.
   const startReset = async () => {
+    if (loading || resetLoading || resetCooldown > 0) return;
+
     const err = cadValPhone(data.telefone);
     setTouched((s) => ({ ...s, telefone: true }));
     setErrors((s) => ({ ...s, telefone: err }));
@@ -836,9 +851,11 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
+    // Trava imediata: bloqueia cliques repetidos mesmo se a request falhar.
+    setResetCooldown(30);
+    setResetLoading(true);
     const result = await requestCode(data.telefone);
-    setLoading(false);
+    setResetLoading(false);
 
     if (!result.ok) {
       setErrors((s) => ({ ...s, senha: result.error || "Erro ao enviar código" }));
@@ -857,6 +874,7 @@ export default function LoginPage() {
 
   // Valida a OTP antes de liberar a criação da nova senha (o servidor revalida no envio).
   const verifyResetCode = async () => {
+    if (loading) return;
     if (code.length < 6) {
       setCodeErr("Digite os 6 dígitos do código.");
       return;
@@ -876,6 +894,7 @@ export default function LoginPage() {
   };
 
   const submitReset = async () => {
+    if (loading) return;
     const e1 = cadValSenha(resetSenha);
     const e2 = !resetSenhaConfirm
       ? "Confirme sua senha."
@@ -1088,9 +1107,16 @@ export default function LoginPage() {
                 </p>
                 <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
                 {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
-                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 2 }} disabled={loading} onClick={handleVerifyCode}>
-                  Entrar
-                  <Icon name="log-in" size={18} color="#f4f2ee" />
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="button"
+                  style={{ width: "100%", marginTop: 2 }}
+                  loading={loading}
+                  onClick={handleVerifyCode}
+                  iconRight={<Icon name="log-in" size={18} color="#f4f2ee" />}
+                >
+                  {loading ? "Entrando..." : "Entrar"}
                 </Button>
                 <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
                   {resend > 0 ? (
@@ -1165,18 +1191,46 @@ export default function LoginPage() {
                   error={touched.senha ? errors.senha : null}
                 />
                 <div className="oria-cad-inline-links" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 12, marginTop: -4 }}>
-                  <button type="button" onClick={startReset} style={authLink}>
-                    Esqueci minha senha
+                  <button
+                    type="button"
+                    onClick={startReset}
+                    disabled={loading || resetLoading || resetCooldown > 0}
+                    aria-busy={resetLoading || undefined}
+                    style={{
+                      ...authLink,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      cursor: loading || resetLoading || resetCooldown > 0 ? "not-allowed" : "pointer",
+                      opacity: loading || resetLoading || resetCooldown > 0 ? 0.55 : 1,
+                    }}
+                  >
+                    {resetLoading && (
+                      <Icon name="loader-circle" size={14} color="currentColor" className="oria-spin-inline" />
+                    )}
+                    {resetLoading
+                      ? "Enviando código..."
+                      : resetCooldown > 0
+                        ? `Aguarde ${resetCooldown}s`
+                        : "Esqueci minha senha"}
                   </button>
                 </div>
                 <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
-                  <Button variant="secondary" size="lg" type="button" onClick={() => setStep("phone")}>
+                  <Button variant="secondary" size="lg" type="button" disabled={loading || resetLoading} onClick={() => setStep("phone")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
                   </Button>
-                  <Button variant="primary" size="lg" type="button" style={{ flex: 1 }} disabled={loading} onClick={submitSenha}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    type="button"
+                    style={{ flex: 1 }}
+                    loading={loading}
+                    disabled={resetLoading}
+                    onClick={submitSenha}
+                    iconRight={<Icon name="arrow-up-right" size={18} color="#f4f2ee" />}
+                  >
                     {loading ? "Entrando..." : "Entrar"}
-                    <Icon name="arrow-up-right" size={18} color="#f4f2ee" />
                   </Button>
                 </div>
               </div>
@@ -1198,9 +1252,16 @@ export default function LoginPage() {
                 </p>
                 <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
                 {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
-                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 2 }} disabled={loading} onClick={verifyResetCode}>
-                  Verificar e continuar
-                  <Icon name="shield-check" size={18} color="#f4f2ee" />
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="button"
+                  style={{ width: "100%", marginTop: 2 }}
+                  loading={loading}
+                  onClick={verifyResetCode}
+                  iconRight={<Icon name="shield-check" size={18} color="#f4f2ee" />}
+                >
+                  {loading ? "Verificando..." : "Verificar e continuar"}
                 </Button>
                 <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
                   {resend > 0 ? (
@@ -1270,13 +1331,20 @@ export default function LoginPage() {
                   error={resetErr.confirm}
                 />
                 <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
-                  <Button variant="secondary" size="lg" type="button" onClick={() => setStep("senha")}>
+                  <Button variant="secondary" size="lg" type="button" disabled={loading} onClick={() => setStep("senha")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
                   </Button>
-                  <Button variant="primary" size="lg" type="button" style={{ flex: 1 }} disabled={loading} onClick={submitReset}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    type="button"
+                    style={{ flex: 1 }}
+                    loading={loading}
+                    onClick={submitReset}
+                    iconRight={<Icon name="check" size={18} color="#f4f2ee" />}
+                  >
                     {loading ? "Salvando..." : "Redefinir senha"}
-                    <Icon name="check" size={18} color="#f4f2ee" />
                   </Button>
                 </div>
               </div>

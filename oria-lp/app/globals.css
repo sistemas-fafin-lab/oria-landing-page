@@ -89,6 +89,18 @@ body {
   to { transform: none; }
 }
 
+/* Spinner for buttons / inline "processando" feedback. Defined at top level
+   (not inside prefers-reduced-motion) so the loading state is always visible;
+   reduced-motion users still get the label change as non-animated feedback. */
+.oria-spin-inline {
+  display: inline-flex;
+  animation: oria-btn-spin 0.7s linear infinite;
+  transform-origin: center;
+}
+@keyframes oria-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Stacked layout: brand panel on top, form below.
    The brand copy is compacted so the form stays reachable, and the
    form gutter gains top padding to clear the absolute back/theme controls. */

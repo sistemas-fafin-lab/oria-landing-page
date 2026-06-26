@@ -1016,6 +1016,7 @@ export default function SignupPage() {
   }, [resend]);
 
   const sendCode = async () => {
+    if (loading) return;
     const err = cadValPhone(data.telefone);
     setTouched((s) => ({ ...s, telefone: true }));
     setErrors((s) => ({ ...s, telefone: err }));
@@ -1037,6 +1038,7 @@ export default function SignupPage() {
   };
 
   const handleVerifyCode = async () => {
+    if (loading) return;
     if (code.length < 6) {
       setCodeErr("Digite os 6 dígitos do código.");
       return;
@@ -1080,6 +1082,7 @@ export default function SignupPage() {
   };
 
   const submitReview = async () => {
+    if (loading) return;
     setLoading(true);
     const result = await signup({
       phone: data.telefone,
@@ -1245,9 +1248,16 @@ export default function SignupPage() {
                   valid={ok("telefone")}
                   helper="Enviaremos um código de verificação por SMS / WhatsApp."
                 />
-                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 6 }} onClick={sendCode}>
-                  Enviar código
-                  <Icon name="arrow-up-right" size={18} color="#f4f2ee" />
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="button"
+                  style={{ width: "100%", marginTop: 6 }}
+                  loading={loading}
+                  onClick={sendCode}
+                  iconRight={<Icon name="arrow-up-right" size={18} color="#f4f2ee" />}
+                >
+                  {loading ? "Enviando código..." : "Enviar código"}
                 </Button>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: "var(--text-muted)", justifyContent: "center", marginTop: 4 }}>
                   <span>Já tem conta?</span>
@@ -1274,9 +1284,16 @@ export default function SignupPage() {
                 </p>
                 <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
                 {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
-                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 2 }} disabled={loading} onClick={handleVerifyCode}>
-                  Verificar e continuar
-                  <Icon name="shield-check" size={18} color="#f4f2ee" />
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="button"
+                  style={{ width: "100%", marginTop: 2 }}
+                  loading={loading}
+                  onClick={handleVerifyCode}
+                  iconRight={<Icon name="shield-check" size={18} color="#f4f2ee" />}
+                >
+                  {loading ? "Verificando..." : "Verificar e continuar"}
                 </Button>
                 <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
                   {resend > 0 ? (
@@ -1446,13 +1463,20 @@ export default function SignupPage() {
                   </span>
                 </p>
                 <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 22 }}>
-                  <Button variant="secondary" size="lg" type="button" onClick={() => setStep("senha")}>
+                  <Button variant="secondary" size="lg" type="button" disabled={loading} onClick={() => setStep("senha")}>
                     <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
                     Voltar
                   </Button>
-                  <Button variant="primary" size="lg" type="button" style={{ flex: 1 }} disabled={loading} onClick={submitReview}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    type="button"
+                    style={{ flex: 1 }}
+                    loading={loading}
+                    onClick={submitReview}
+                    iconRight={<Icon name="check" size={18} color="#f4f2ee" />}
+                  >
                     {loading ? "Criando conta..." : "Criar minha conta"}
-                    <Icon name="check" size={18} color="#f4f2ee" />
                   </Button>
                 </div>
               </div>
