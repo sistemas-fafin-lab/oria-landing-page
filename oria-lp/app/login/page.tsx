@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import { Icon, Logo, Button, Badge } from "../../components/parts";
 import { Reveal } from "../../components/motion";
-import { requestCode, verifyCode, login, setToken } from "../../lib/auth-client";
+import { requestCode, verifyCode, login, resetPassword, setToken } from "../../lib/auth-client";
 import {
   SkipLink,
   ShortcutsButton,
@@ -36,6 +36,13 @@ function cadValPhone(v: string): string | null {
   const ddd = parseInt(d.slice(0, 2), 10);
   if (ddd < 11 || ddd > 99) return "DDD inválido.";
   if (d.length === 11 && d[2] !== "9") return "Celular deve começar com 9.";
+  return null;
+}
+
+function cadValSenha(v: string): string | null {
+  if (!v) return "Crie uma nova senha.";
+  if (v.length < 8) return "Use ao menos 8 caracteres.";
+  if (!/[A-Za-z]/.test(v) || !/\d/.test(v)) return "Combine letras e números.";
   return null;
 }
 
@@ -671,7 +678,9 @@ const AUTH_SHORTCUTS: ShortcutGroup[] = [
 /* ───────────── app de login ───────────── */
 export default function LoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"phone" | "otp" | "senha" | "done">("phone");
+  const [step, setStep] = useState<
+    "phone" | "otp" | "senha" | "reset-otp" | "reset-senha" | "done"
+  >("phone");
   const [data, setData] = useState({
     telefone: "",
     senha: "",
@@ -688,6 +697,12 @@ export default function LoginPage() {
   // JWT devolvido pelo login (senha válida) — só é persistido após
   // o usuário confirmar o token do WhatsApp. Login = senha + token.
   const [pendingToken, setPendingToken] = useState<string | null>(null);
+
+  // fluxo "Esqueci minha senha" — reaproveita o telefone e a OTP do WhatsApp
+  const [resetSenha, setResetSenha] = useState("");
+  const [resetSenhaConfirm, setResetSenhaConfirm] = useState("");
+  const [resetErr, setResetErr] = useState<{ senha?: string | null; confirm?: string | null }>({});
+  const [resetOk, setResetOk] = useState(false);
   const { shortcutsEnabled } = useAccessibility();
 
   // tema global (claro/escuro/sistema) — compartilhado com todo o site
@@ -735,6 +750,7 @@ export default function LoginPage() {
     const err = cadValPhone(data.telefone);
     setTouched((s) => ({ ...s, telefone: true }));
     setErrors((s) => ({ ...s, telefone: err }));
+    setResetOk(false);
     if (!err) setStep("senha");
   };
 
@@ -810,6 +826,85 @@ export default function LoginPage() {
     setStep("otp");
   };
 
+  // "Esqueci minha senha": dispara a OTP do WhatsApp e abre o fluxo de redefinição.
+  const startReset = async () => {
+    const err = cadValPhone(data.telefone);
+    setTouched((s) => ({ ...s, telefone: true }));
+    setErrors((s) => ({ ...s, telefone: err }));
+    if (err) {
+      setStep("phone");
+      return;
+    }
+
+    setLoading(true);
+    const result = await requestCode(data.telefone);
+    setLoading(false);
+
+    if (!result.ok) {
+      setErrors((s) => ({ ...s, senha: result.error || "Erro ao enviar código" }));
+      return;
+    }
+
+    setCode("");
+    setCodeErr(null);
+    setResetOk(false);
+    setResetSenha("");
+    setResetSenhaConfirm("");
+    setResetErr({});
+    setResend(30);
+    setStep("reset-otp");
+  };
+
+  // Valida a OTP antes de liberar a criação da nova senha (o servidor revalida no envio).
+  const verifyResetCode = async () => {
+    if (code.length < 6) {
+      setCodeErr("Digite os 6 dígitos do código.");
+      return;
+    }
+
+    setLoading(true);
+    const result = await verifyCode(data.telefone, code);
+    setLoading(false);
+
+    if (!result.ok || !result.valido) {
+      setCodeErr(result.message || result.error || "Código inválido");
+      return;
+    }
+
+    setCodeErr(null);
+    setStep("reset-senha");
+  };
+
+  const submitReset = async () => {
+    const e1 = cadValSenha(resetSenha);
+    const e2 = !resetSenhaConfirm
+      ? "Confirme sua senha."
+      : resetSenhaConfirm !== resetSenha
+        ? "As senhas não coincidem."
+        : null;
+    setResetErr({ senha: e1, confirm: e2 });
+    if (e1 || e2) return;
+
+    setLoading(true);
+    const result = await resetPassword(data.telefone, code, resetSenha);
+    setLoading(false);
+
+    if (!result.ok) {
+      setResetErr({ senha: result.error || "Erro ao redefinir senha" });
+      return;
+    }
+
+    // Senha redefinida: volta ao login com a nova senha (que dispara senha + token).
+    setData((s) => ({ ...s, senha: "" }));
+    setTouched((s) => ({ ...s, senha: false }));
+    setErrors((s) => ({ ...s, senha: null }));
+    setResetSenha("");
+    setResetSenhaConfirm("");
+    setResetErr({});
+    setResetOk(true);
+    setStep("senha");
+  };
+
   useKeydown((e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key === "Escape") {
@@ -817,6 +912,7 @@ export default function LoginPage() {
       if (!shortcutsEnabled) return;
       if (step === "otp") { e.preventDefault(); setStep("senha"); }
       else if (step === "senha") { e.preventDefault(); setStep("phone"); }
+      else if (step === "reset-otp" || step === "reset-senha") { e.preventDefault(); setStep("senha"); }
       return;
     }
     if (!shortcutsEnabled) return;
@@ -826,17 +922,22 @@ export default function LoginPage() {
         if (step === "phone") proceedPhone();
         else if (step === "otp") handleVerifyCode();
         else if (step === "senha") submitSenha();
+        else if (step === "reset-otp") verifyResetCode();
+        else if (step === "reset-senha") submitReset();
       }
       return;
     }
     if (e.key === "?") { e.preventDefault(); setHelpOpen((o) => !o); }
   });
 
+  const isReset = step === "reset-otp" || step === "reset-senha";
   const stepNum = step === "senha" ? 2 : step === "otp" ? 3 : 1;
   const labels = {
     phone: "Acesse sua conta",
     otp: "Verifique seu número",
     senha: "Acesse com sua senha",
+    "reset-otp": "Verifique seu número",
+    "reset-senha": "Crie uma nova senha",
   };
 
   const authLink = {
@@ -932,7 +1033,13 @@ export default function LoginPage() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ width: "100%", maxWidth: 460, margin: "0 auto" }}>
             {step !== "done" && (
-              <StepHeader step={stepNum} total={3} label={labels[step]} showSteps={false} />
+              <StepHeader
+                step={stepNum}
+                total={3}
+                label={labels[step]}
+                eyebrow={isReset ? "Redefinir senha" : undefined}
+                showSteps={false}
+              />
             )}
 
             {/* PASSO 1 — telefone */}
@@ -1006,6 +1113,24 @@ export default function LoginPage() {
             {/* PASSO 2 — senha */}
             {step === "senha" && (
               <div className="oria-step-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {resetOk && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 9,
+                      padding: "11px 15px",
+                      borderRadius: 14,
+                      background: "rgba(106,138,122,0.14)",
+                      border: "1px solid rgba(106,138,122,0.35)",
+                    }}
+                  >
+                    <Icon name="check" size={17} color="var(--oria-primary)" />
+                    <span style={{ fontSize: 13.5, color: "var(--text-secondary)" }}>
+                      Senha redefinida! Entre com sua nova senha.
+                    </span>
+                  </div>
+                )}
                 <div
                   style={{
                     display: "flex",
@@ -1040,7 +1165,7 @@ export default function LoginPage() {
                   error={touched.senha ? errors.senha : null}
                 />
                 <div className="oria-cad-inline-links" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 12, marginTop: -4 }}>
-                  <button type="button" onClick={() => {}} style={authLink}>
+                  <button type="button" onClick={startReset} style={authLink}>
                     Esqueci minha senha
                   </button>
                 </div>
@@ -1052,6 +1177,106 @@ export default function LoginPage() {
                   <Button variant="primary" size="lg" type="button" style={{ flex: 1 }} disabled={loading} onClick={submitSenha}>
                     {loading ? "Entrando..." : "Entrar"}
                     <Icon name="arrow-up-right" size={18} color="#f4f2ee" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* REDEFINIR — OTP */}
+            {step === "reset-otp" && (
+              <div className="oria-step-enter" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--text-secondary)", margin: "-8px 0 0" }}>
+                  Para redefinir sua senha, enviamos um código de 6 dígitos para{" "}
+                  <strong style={{ color: "var(--text-primary)" }}>{data.telefone}</strong>.
+                  <button
+                    type="button"
+                    onClick={() => setStep("senha")}
+                    style={{ background: "none", border: "none", color: "var(--oria-sage)", fontWeight: 600, cursor: "pointer", padding: "0 0 0 6px", fontSize: 14, fontFamily: "var(--font-body)" }}
+                  >
+                    Cancelar
+                  </button>
+                </p>
+                <OtpInput value={code} onChange={(c) => { setCode(c); setCodeErr(null); }} error={codeErr} />
+                {codeErr && <span style={{ fontSize: 12.5, color: CAD_CLAY, marginTop: -8 }}>{codeErr}</span>}
+                <Button variant="primary" size="lg" type="button" style={{ width: "100%", marginTop: 2 }} disabled={loading} onClick={verifyResetCode}>
+                  Verificar e continuar
+                  <Icon name="shield-check" size={18} color="#f4f2ee" />
+                </Button>
+                <div style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)" }}>
+                  {resend > 0 ? (
+                    <span>
+                      Reenviar código em <strong style={{ color: "var(--text-secondary)" }}>{resend}s</strong>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={resendCode}
+                      style={{ background: "none", border: "none", color: "var(--oria-sage)", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "var(--font-body)" }}
+                    >
+                      Reenviar código
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* REDEFINIR — nova senha */}
+            {step === "reset-senha" && (
+              <div className="oria-step-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--text-secondary)", margin: "-8px 0 0" }}>
+                  Crie uma nova senha para acessar sua conta com segurança.
+                </p>
+                <PasswordField
+                  name="reset-senha"
+                  label="Nova senha"
+                  autoFocus
+                  autoComplete="new-password"
+                  value={resetSenha}
+                  onChange={(e) => {
+                    setResetSenha(e.target.value);
+                    if (resetErr.senha) setResetErr((s) => ({ ...s, senha: cadValSenha(e.target.value) }));
+                  }}
+                  onBlur={() => setResetErr((s) => ({ ...s, senha: cadValSenha(resetSenha) }))}
+                  error={resetErr.senha}
+                  helper={resetErr.senha ? undefined : "Mínimo de 8 caracteres, com letras e números."}
+                />
+                <PasswordField
+                  name="reset-senha-confirm"
+                  label="Confirmar nova senha"
+                  autoComplete="new-password"
+                  value={resetSenhaConfirm}
+                  onChange={(e) => {
+                    setResetSenhaConfirm(e.target.value);
+                    if (resetErr.confirm)
+                      setResetErr((s) => ({
+                        ...s,
+                        confirm: !e.target.value
+                          ? "Confirme sua senha."
+                          : e.target.value !== resetSenha
+                            ? "As senhas não coincidem."
+                            : null,
+                      }));
+                  }}
+                  onBlur={() =>
+                    setResetErr((s) => ({
+                      ...s,
+                      confirm: !resetSenhaConfirm
+                        ? "Confirme sua senha."
+                        : resetSenhaConfirm !== resetSenha
+                          ? "As senhas não coincidem."
+                          : null,
+                    }))
+                  }
+                  error={resetErr.confirm}
+                />
+                <div className="oria-cad-actions" style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                  <Button variant="secondary" size="lg" type="button" onClick={() => setStep("senha")}>
+                    <Icon name="arrow-up-right" size={18} color="currentColor" style={{ transform: "rotate(-90deg)" }} />
+                    Voltar
+                  </Button>
+                  <Button variant="primary" size="lg" type="button" style={{ flex: 1 }} disabled={loading} onClick={submitReset}>
+                    {loading ? "Salvando..." : "Redefinir senha"}
+                    <Icon name="check" size={18} color="#f4f2ee" />
                   </Button>
                 </div>
               </div>

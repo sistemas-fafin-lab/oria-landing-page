@@ -113,6 +113,30 @@ export async function login(phone: string, password: string): Promise<AuthRespon
   }
 }
 
+export async function resetPassword(
+  phone: string,
+  code: string,
+  newPassword: string
+): Promise<AuthResponse> {
+  try {
+    const response = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, code, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { ok: false, error: data.error || 'Erro ao redefinir senha' };
+    }
+
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: 'Erro de conexão' };
+  }
+}
+
 // Session management
 export function setToken(token: string): void {
   if (typeof window !== 'undefined') {
