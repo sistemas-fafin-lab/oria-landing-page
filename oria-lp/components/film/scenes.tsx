@@ -5,7 +5,7 @@ import { Easing, clamp, useSprite } from "./animations";
 import { C, FD, FB, inout, Mark, Caption, FileGlyph } from "./brand";
 
 // ── ExamCard ─────────────────────────────────────────────────────────────
-function ExamCard({
+export function ExamCard({
   label,
   value,
   unit,

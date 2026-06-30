@@ -893,6 +893,8 @@ const BrandPanel = memo(function BrandPanel({ mode }: { mode: "login" | "signup"
           paddingTop: "clamp(14px, 2.2vh, 28px)",
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
           gap: 9,
           fontSize: 12.5,
           color: "rgba(244,242,238,0.6)",

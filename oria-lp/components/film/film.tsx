@@ -5,9 +5,22 @@ import { Easing, clamp, Stage, Sprite, useSprite, useTimeline, useTime } from ".
 import { C, FD, FB, inout, Mark } from "./brand";
 import { SceneProblem, SceneSend, SceneProcess, SceneReceive, SceneClose } from "./scenes";
 import { Backdrop } from "./brand";
+import {
+  BackdropM,
+  SceneOpenM,
+  SceneProblemM,
+  SceneSendM,
+  SceneProcessM,
+  SceneReceiveM,
+  SceneCloseM,
+  JourneyTrackerM,
+} from "./scenes-mobile";
 
 const FILM_DUR = 29.5;
 const SCENE_OFFSET = 3.5;
+
+/* Mobile cut — same narrative recomposed for a 4:5 (1080×1350) frame. */
+const FILM_DUR_M = 32;
 
 /* ── Welcome scene (t = 0 → 3.5s) ──────────────────────────────────────── */
 function SceneWelcome() {
@@ -420,6 +433,57 @@ export function Film({
       <Sprite start={O + 20.0} end={FILM_DUR}>
         <SceneClose />
       </Sprite>
+
+      {startOnMount && <AutoStarter />}
+
+      <FilmControls />
+    </Stage>
+  );
+}
+
+/* ── Mobile film composition (4:5) ─────────────────────────────────────── */
+export function FilmMobile({
+  startOnMount = false,
+  inline = false,
+}: {
+  startOnMount?: boolean;
+  inline?: boolean;
+}) {
+  return (
+    <Stage
+      width={1080}
+      height={1350}
+      duration={FILM_DUR_M}
+      fps={60}
+      immersive={!inline}
+      hideBar={inline}
+      autoplay={false}
+      loop={true}
+      persistKey="oria-film-m"
+      background="linear-gradient(178deg, #0e1513 0%, #111715 44%, #0b1712 100%)"
+    >
+      <BackdropM />
+
+      <Sprite start={0} end={4.2}>
+        <SceneOpenM />
+      </Sprite>
+      <Sprite start={4.2} end={9.4}>
+        <SceneProblemM />
+      </Sprite>
+      <Sprite start={9.4} end={14.6}>
+        <SceneSendM />
+      </Sprite>
+      <Sprite start={14.6} end={19.0}>
+        <SceneProcessM />
+      </Sprite>
+      <Sprite start={19.0} end={25.0}>
+        <SceneReceiveM />
+      </Sprite>
+      <Sprite start={25.0} end={FILM_DUR_M}>
+        <SceneCloseM />
+      </Sprite>
+
+      <JourneyTrackerM />
 
       {startOnMount && <AutoStarter />}
 

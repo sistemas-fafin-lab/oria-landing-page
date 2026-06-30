@@ -641,12 +641,14 @@ const BrandPanel = memo(function BrandPanel() {
           paddingTop: "clamp(14px, 2.2vh, 28px)",
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
           gap: 9,
           fontSize: 12.5,
           color: "rgba(244,242,238,0.6)",
         }}
       >
-        <Icon name="lock" size={14} color="var(--oria-sage)" />
+        <Icon name="lock" size={14} color="var(--oria-sage)"/>
         A ORIA não fornece diagnóstico médico nem substitui a consulta com profissionais de saúde.
       </div>
     </div>
@@ -953,9 +955,9 @@ export default function LoginPage() {
   const stepNum = step === "senha" ? 2 : step === "otp" ? 3 : 1;
   const labels = {
     phone: "Acesse sua conta",
-    otp: "Verifique seu número",
+    otp: "Verifique seu WhatsApp",
     senha: "Acesse com sua senha",
-    "reset-otp": "Verifique seu número",
+    "reset-otp": "Verifique seu WhatsApp",
     "reset-senha": "Crie uma nova senha",
   };
 
@@ -1455,7 +1457,7 @@ export default function LoginPage() {
           {step !== "done" && (
             <div style={{ flexShrink: 0 }}>
               <div className="oria-cad-trust">
-                <Icon name="lock" size={13} color="var(--oria-sage)" style={{ marginTop: 2, flexShrink: 0 }} />
+                <Icon name="lock" size={13} color="var(--oria-sage)" style={{ marginTop: 2, flexShrink: 0,}} />
                 <span>A ORIA não fornece diagnóstico médico nem substitui a consulta com profissionais de saúde.</span>
               </div>
               <div style={{ paddingTop: 24, textAlign: "center", fontSize: 12, color: "var(--text-muted)" }}>

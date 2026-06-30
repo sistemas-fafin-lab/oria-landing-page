@@ -6,11 +6,12 @@ import {
   Reveal,
   useReducedMotion,
   useCountUp,
+  useIsMobile,
   LivingLines,
 } from "./motion";
 import { UserMenu } from "./user-menu";
 import { HeroPhoneScene } from "./phone-chat";
-import { Film } from "./film/film";
+import { Film, FilmMobile } from "./film/film";
 
 const WA = "Enviar exame pelo WhatsApp";
 
@@ -762,6 +763,7 @@ export function FilmSection() {
   const ref = React.useRef<HTMLDivElement>(null);
   const [inView, setInView] = React.useState(false);
   const [animated, setAnimated] = React.useState(false);
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     const el = ref.current;
@@ -840,13 +842,20 @@ export function FilmSection() {
         position: "relative",
         zIndex: 1,
         width: "100%",
-        /* The film canvas is a fixed 16:9 composition (contain-scaled), so the
-           wrapper must keep 16:9 on every breakpoint — a taller portrait ratio
-           only adds letterbox bars that read as gaps above/below the video. */
-        aspectRatio: "16 / 9",
+        /* Each film canvas is a fixed-size composition (contain-scaled), so the
+           wrapper must match its aspect on every breakpoint or letterbox bars
+           read as gaps above/below the video. Mobile uses the dedicated 4:5
+           cut; desktop/tablet keeps the 16:9 cut. */
+        aspectRatio: isMobile ? "4 / 5" : "16 / 9",
         overflow: "hidden",
-        marginTop: -28,
-        marginBottom: -28,
+        /* The neighbouring sections (Hero above, Problem below) are layered over
+           the film (zIndex 2 vs 1) with 28px rounded corners, so the film tucks
+           under them. Desktop overlaps by -28; mobile overlaps a touch more
+           (-32) so the rounding sits cleanly over the 4:5 cut. The mobile scene
+           content is inset from the top/bottom edges (see scenes-mobile.tsx) so
+           this tuck only ever covers the living background, never content. */
+        marginTop: isMobile ? -32 : -28,
+        marginBottom: isMobile ? -32 : -28,
         opacity: animated ? 1 : 0,
         transform: animated
           ? "scale(1) translateY(0)"
@@ -858,7 +867,11 @@ export function FilmSection() {
         willChange: "transform, opacity",
       }}
     >
-      <Film startOnMount={inView} inline />
+      {isMobile ? (
+        <FilmMobile startOnMount={inView} inline />
+      ) : (
+        <Film startOnMount={inView} inline />
+      )}
     </div>
   );
 }

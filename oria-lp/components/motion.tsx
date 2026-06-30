@@ -45,6 +45,25 @@ export function useReducedMotion() {
   return r;
 }
 
+/* ── useIsMobile ──────────────────────────────────────────────────── */
+/* Starts false (matches SSR) and resolves the real match after mount to
+   avoid a hydration mismatch. */
+export function useIsMobile(maxWidth = 640) {
+  const [m, setM] = useState(false);
+  useEffect(() => {
+    if (typeof matchMedia === "undefined") return;
+    const mq = matchMedia(`(max-width: ${maxWidth}px)`);
+    const on = () => setM(mq.matches);
+    on();
+    mq.addEventListener ? mq.addEventListener("change", on) : mq.addListener(on);
+    return () =>
+      mq.removeEventListener
+        ? mq.removeEventListener("change", on)
+        : mq.removeListener(on);
+  }, [maxWidth]);
+  return m;
+}
+
 /* ── useReveal ────────────────────────────────────────────────────── */
 export function useReveal({
   threshold = 0.18,

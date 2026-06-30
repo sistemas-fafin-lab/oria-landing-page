@@ -96,7 +96,7 @@ body {
 }
 .oria-cad-trust {
   display: none;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   margin-top: 22px;
   font-size: 12px;
@@ -195,6 +195,10 @@ body {
     padding: 0 16px 132px !important;
     min-height: 100dvh !important;
     overflow: visible !important;
+    /* Grid items default to min-width:auto, which lets wide content (e.g. the
+       6-box OTP row) stretch the column past the viewport. Allow it to shrink
+       so flexible children size down to fit. */
+    min-width: 0 !important;
   }
   /* Form-first mobile: hide the desktop brand hero + floating round
      controls; the slim topbar carries identity instead. */
@@ -255,7 +259,11 @@ body {
     opacity: 0.85;
   }
   .oria-cad-trust {
-    display: flex;
+    display: block;
+    text-align: center;
+  }
+  .oria-cad-trust svg {
+    display: none;
   }
   /* Primary action: a floating glass pill, centered and thumb-reachable. */
   .oria-cad-cta {
@@ -329,6 +337,21 @@ body {
   }
   .oria-cad-brand {
     padding: 30px 18px 34px !important;
+  }
+}
+
+/* Very narrow phones: the Voltar/primary pair can no longer sit side-by-side
+   without the button fills shrinking under their labels — stack them instead
+   (the FAB no longer occupies the bottom, so a taller pill is fine). */
+@media (max-width: 360px) {
+  .oria-cad-cta.oria-cad-actions {
+    flex-direction: column-reverse !important;
+  }
+  .oria-cad-cta.oria-cad-actions > button {
+    width: 100% !important;
+  }
+  .oria-cad-form-wrap {
+    padding-bottom: 178px !important;
   }
 }
 
