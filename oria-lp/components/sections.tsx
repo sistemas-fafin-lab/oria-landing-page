@@ -12,6 +12,7 @@ import {
 import { UserMenu } from "./user-menu";
 import { HeroPhoneScene } from "./phone-chat";
 import { Film, FilmMobile } from "./film/film";
+import { LegalModal, type LegalDocKey } from "./legal-modal";
 
 const WA = "Enviar exame pelo WhatsApp";
 
@@ -2210,11 +2211,17 @@ export function FinalCTA({
 
 /* ── Footer ────────────────────────────────────────────────────────────── */
 export function Footer() {
+  const [legal, setLegal] = React.useState<LegalDocKey | null>(null);
   const nav: [string, string][] = [
     ["O que é", "#solucao"],
     ["Como funciona", "#como"],
     ["O que você recebe", "#beneficios"],
     ["Diferenciais", "#diferenciais"],
+  ];
+  const info: [string, LegalDocKey][] = [
+    ["Privacidade", "privacy"],
+    ["Termos", "terms"],
+    ["Aviso médico", "medical"],
   ];
   return (
     <footer
@@ -2252,13 +2259,10 @@ export function Footer() {
           </p>
         </div>
         <FootCol title="Navegação" links={nav} />
-        <FootCol
+        <FootColButtons
           title="Informações"
-          links={[
-            ["Privacidade", "#"],
-            ["Termos", "#"],
-            ["Aviso médico", "#"],
-          ]}
+          links={info}
+          onSelect={setLegal}
         />
         <div
           className="oria-footer-notice"
@@ -2303,7 +2307,56 @@ export function Footer() {
           </p>
         </div>
       </div>
+      <LegalModal docKey={legal} onClose={() => setLegal(null)} />
     </footer>
+  );
+}
+
+/* Footer column whose items open legal modals instead of navigating. */
+function FootColButtons({
+  title,
+  links,
+  onSelect,
+}: {
+  title: string;
+  links: [string, LegalDocKey][];
+  onSelect: (key: LegalDocKey) => void;
+}) {
+  return (
+    <div>
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          textTransform: "uppercase",
+          letterSpacing: "0.16em",
+          fontSize: 11,
+          color: "rgba(244,242,238,0.55)",
+          fontWeight: 600,
+        }}
+      >
+        {title}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: 12,
+          marginTop: 16,
+        }}
+      >
+        {links.map(([l, key]) => (
+          <button
+            key={l}
+            type="button"
+            onClick={() => onSelect(key)}
+            className="oria-footer-legal-link"
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

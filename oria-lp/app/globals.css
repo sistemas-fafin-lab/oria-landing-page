@@ -1278,6 +1278,348 @@ body {
   box-shadow: var(--shadow-cta);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Legal modals — Privacidade · Termos · Aviso médico
+   Premium centered dialog opened from the footer.
+   ───────────────────────────────────────────────────────────── */
+.oria-footer-legal-link {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-align: left;
+  color: rgba(244, 242, 238, 0.75);
+  cursor: pointer;
+  transition: color 0.2s var(--ease-apple);
+}
+.oria-footer-legal-link:hover {
+  color: #f4f2ee;
+}
+
+.oria-legal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(8, 24, 19, 0.58);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: oria-legal-fade 0.28s var(--ease-apple) both;
+}
+@keyframes oria-legal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.oria-legal-modal {
+  position: fixed;
+  z-index: 210;
+  top: 50%;
+  left: 50%;
+  width: min(720px, calc(100vw - 32px));
+  max-height: min(86dvh, 900px);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-bento-lg);
+  box-shadow: 0 40px 90px -20px rgba(8, 24, 19, 0.55),
+              0 12px 30px rgba(8, 24, 19, 0.28);
+  animation: oria-legal-pop 0.34s var(--ease-spring) both;
+}
+@keyframes oria-legal-pop {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Header — gradient band with brand-tinted icon chip. */
+.oria-legal-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 28px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--oria-primary) 12%, transparent), transparent 60%);
+}
+.oria-legal-head-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.oria-legal-head-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: #f4f2ee;
+  background: linear-gradient(160deg, var(--oria-primary), var(--oria-primary-deep));
+  box-shadow: var(--shadow-cta);
+}
+.oria-legal-eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--oria-sage);
+}
+.oria-legal-title {
+  margin: 3px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.35rem, 1.2rem + 0.7vw, 1.6rem);
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+.oria-legal-close {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s var(--ease-apple), border-color 0.2s var(--ease-apple),
+              background 0.2s var(--ease-apple);
+}
+.oria-legal-close:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background: var(--bg-surface);
+}
+
+/* Scrollable body. */
+.oria-legal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 28px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--oria-sage) 48%, transparent) transparent;
+}
+.oria-legal-body::-webkit-scrollbar { width: 5px; }
+.oria-legal-body::-webkit-scrollbar-track { background: transparent; }
+.oria-legal-body::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--oria-sage) 45%, transparent);
+  border-radius: 999px;
+}
+.oria-legal-body::-webkit-scrollbar-thumb:hover { background: var(--oria-sage); }
+
+.oria-legal-intro {
+  margin: 0 0 26px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.oria-legal-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.oria-legal-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.oria-legal-num {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--oria-primary);
+  background: var(--ok-soft);
+}
+.dark .oria-legal-num { color: var(--oria-mint); }
+.oria-legal-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.oria-legal-section-body {
+  padding-left: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.oria-legal-p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.oria-legal-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.oria-legal-list li {
+  display: flex;
+  gap: 12px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.oria-legal-list strong {
+  color: var(--text-primary);
+  font-weight: 650;
+}
+.oria-legal-list-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--oria-primary);
+}
+.dark .oria-legal-list-dot { background: var(--oria-sage); }
+
+/* Highlight callout for the strongest statements. */
+.oria-legal-highlight {
+  display: flex;
+  gap: 13px;
+  padding: 15px 17px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklab, var(--oria-primary) 22%, transparent);
+  background: color-mix(in oklab, var(--oria-primary) 7%, var(--bg-elevated));
+}
+.dark .oria-legal-highlight {
+  border-color: color-mix(in oklab, var(--oria-sage) 34%, transparent);
+  background: color-mix(in oklab, var(--oria-sage) 12%, transparent);
+}
+.oria-legal-highlight-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--oria-primary);
+  background: var(--bg-elevated);
+  border: 1px solid color-mix(in oklab, var(--oria-primary) 18%, transparent);
+}
+.dark .oria-legal-highlight-icon {
+  color: var(--oria-mint);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: color-mix(in oklab, var(--oria-sage) 30%, transparent);
+}
+.oria-legal-highlight p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 550;
+  color: var(--text-primary);
+}
+
+.oria-legal-footnote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.oria-legal-footnote :first-child { flex-shrink: 0; color: var(--oria-primary); }
+.dark .oria-legal-footnote :first-child { color: var(--oria-sage); }
+
+/* Footer bar. */
+.oria-legal-foot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+}
+.oria-legal-updated {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.oria-legal-foot-btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: #f4f2ee;
+  background: var(--oria-primary);
+  box-shadow: var(--shadow-cta);
+  transition: background 0.2s var(--ease-apple), transform 0.2s var(--ease-apple);
+}
+.oria-legal-foot-btn:hover {
+  background: var(--oria-primary-deep);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+  .oria-legal-modal {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-bento-lg) var(--radius-bento-lg) 0 0;
+    border-bottom: none;
+    animation: oria-legal-sheet 0.36s var(--ease-out) both;
+  }
+  @keyframes oria-legal-sheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .oria-legal-head { padding: 22px 20px 18px; }
+  .oria-legal-body { padding: 20px 20px 24px; }
+  .oria-legal-section-body { padding-left: 0; }
+  .oria-legal-foot { padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oria-legal-overlay,
+  .oria-legal-modal { animation: none; }
+}
+
 /* Accessibility controls. */
 .oria-a11y {
   display: flex;
